@@ -1,0 +1,45 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.blue-line {
+  width: 100%;
+  height: 20px;
+  background-color: blue;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+}
+
+.site-name {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px; /* adds space between buttons */
+}
+
+.nav-buttons button {
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 25px;         /* round  buttons */
+}
+
+.login-button {
+  background-color: black;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 25px;         /* round  buttons */
+}

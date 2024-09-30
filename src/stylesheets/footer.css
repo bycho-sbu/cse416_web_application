@@ -1,0 +1,41 @@
+.footer {
+    background-color: #f9f9f9; /* light background */
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #ccc; 
+  }
+  
+  .footer-content {
+    display: flex;
+    justify-content: space-evenly; /* paddings between contents */
+    flex-wrap: wrap; 
+  }
+  
+  .company-info, .legal-info {
+    margin: 10px;
+  }
+  
+  h2 {
+    font-weight: 300;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  ul {
+    list-style: none; 
+    padding: 0; 
+  }
+  
+  ul li {
+    margin: 5px 0; 
+  }
+  
+  a {
+    text-decoration: none; /* Removes underline */
+    color: #2196F3; /* Link color */
+  }
+  
+  .footer-bottom {
+    margin-top: 20px; /* Space above copyright text */
+  }
+  
