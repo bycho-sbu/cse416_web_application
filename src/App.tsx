@@ -4,6 +4,8 @@ import Header from './components/Header';
 import Homepage from "./components/Homepage";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
+import Feedboard from "./components/Feedboard"
+
 import './stylesheets/header.css';
 import './stylesheets/global.css'; 
 import './App.css'
@@ -14,6 +16,7 @@ function App() {
   return (
     <div>
       <>
+        <Header />
         <Dashboard />
       </>
       <>
@@ -24,7 +27,12 @@ function App() {
         <Homepage />
       </>
       <Footer />
+      <>
+      <Header />
+      <Feedboard />
+      </>
     </div>
+    
     
   )
 }

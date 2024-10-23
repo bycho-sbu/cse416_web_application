@@ -1,0 +1,121 @@
+.feedboard {
+    display: flex;
+    flex-direction: column; 
+    min-height: 80vh; /* fit to page */ 
+    padding: 10px; 
+  }
+  
+  .feedboard-table-container {
+    flex: 1; 
+  }
+  
+  
+  .feedboard-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .feedboard-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .feedboard-search {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    width: 200px;
+  }
+  
+  .feedboard-sort {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .feedboard-table-container {
+    overflow-x: auto;
+  }
+  
+  .feedboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+  
+  .feedboard-table th,
+  .feedboard-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .feedboard-table th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+  }
+  
+  .feedboard-table tr:nth-child(even) {
+    background-color: #f8f8f8;
+  }
+  
+  .feedboard-button {
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .feedboard-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .feedboard-page-button {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    color: #000;
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .feedboard-page-button.active {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  .feedboard-page-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 768px) {
+    .feedboard-controls {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .feedboard-search,
+    .feedboard-sort {
+      width: 100%;
+    }
+  
+    .feedboard-table {
+      font-size: 0.9rem;
+    }
+  
+    .feedboard-button {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+  }
