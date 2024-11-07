@@ -5,6 +5,7 @@ import Homepage from "./components/Homepage";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
 import Feedboard from "./components/Feedboard"
+import Feedback from './components/Feedback';
 
 import './stylesheets/header.css';
 import './stylesheets/global.css'; 
@@ -20,6 +21,7 @@ function App() {
         <Dashboard />
       </>
       <>
+        <Header />
         <Login />
       </>
       <Header /> 
@@ -30,6 +32,10 @@ function App() {
       <>
       <Header />
       <Feedboard />
+      </>
+      <>
+      <Header />
+      <Feedback />
       </>
     </div>
     
