@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import '../stylesheets/Feedboard.css'
 
+// temporary interface to hold resume details 
 interface Resume {
   id: string;
   name: string;
