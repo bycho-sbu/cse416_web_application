@@ -1,0 +1,76 @@
+.feedback-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+    text-align: left;
+  }
+  
+  .feedback-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    
+  }
+  
+  .feedback-input {
+    width: 100%;
+    max-width: 800px;
+    min-height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    resize: vertical;
+  }
+  
+  .feedback-submit-button {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .feedback-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  .feedback-card {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .feedback-comment {
+    font-size: 1rem;
+    margin: 10px 0;
+    color: #555;
+  }
+  
+  .feedback-reviewer {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
+  .feedback-reply-button {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
