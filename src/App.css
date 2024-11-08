@@ -33,6 +33,13 @@
   }
 }
 
+@media (max-width: 768px) {
+    .half-width,
+    .third-width {
+      flex: 1 1 100%;
+    }
+}
+
 .card {
   padding: 2em;
 }

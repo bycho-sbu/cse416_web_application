@@ -1,46 +1,85 @@
-import { useState } from 'react'
-import Dashboard from './components/Dashboard'
+// import { useState } from 'react'
+// import Dashboard from './components/Dashboard'
+// import Header from './components/Header'; 
+// import Homepage from "./components/Homepage";
+// import Footer from "./components/Footer";
+// import Login from "./components/Login";
+// import Feedboard from "./components/Feedboard"
+// import Feedback from './components/Feedback';
+
+// import './stylesheets/header.css';
+// import './stylesheets/global.css'; 
+// import './App.css'
+// import ResumeEditor from './components/ResumeEditor';
+
+// function App() {
+//   const [count, setCount] = useState(0)
+
+//   return (
+//     <div>
+//       <>
+//         <Header />
+//         <Dashboard />
+//       </>
+//       <>
+//         <Header />
+//         <Login />
+//       </>
+//       <>
+//         <Header /> 
+//         <Homepage />
+//       </>
+//       <Footer />
+//       <>
+//       <Header />
+//       <Feedboard />
+//       </>
+//       <>
+//       <Header />
+//       <Feedback />
+//       </>
+
+//       <>
+//       <Header />
+//       <ResumeEditor />
+//       </>
+//     </div>
+    
+    
+//   )
+// }
+
+// export default App
+
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Dashboard from './components/Dashboard';
 import Header from './components/Header'; 
-import Homepage from "./components/Homepage";
-import Footer from "./components/Footer";
-import Login from "./components/Login";
-import Feedboard from "./components/Feedboard"
+import Homepage from './components/Homepage';
+import Footer from './components/Footer';
+import Login from './components/Login';
+import Feedboard from './components/Feedboard';
 import Feedback from './components/Feedback';
+import ResumeEditor from './components/ResumeEditor';
 
 import './stylesheets/header.css';
 import './stylesheets/global.css'; 
-import './App.css'
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div>
-      <>
-        <Header />
-        <Dashboard />
-      </>
-      <>
-        <Header />
-        <Login />
-      </>
-      <Header /> 
-      <>
-        <Homepage />
-      </>
+    <Router>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/feedboard" element={<Feedboard />} />
+        <Route path="/feedback" element={<Feedback />} />
+        <Route path="/resume-editor" element={<ResumeEditor />} />
+      </Routes>
       <Footer />
-      <>
-      <Header />
-      <Feedboard />
-      </>
-      <>
-      <Header />
-      <Feedback />
-      </>
-    </div>
-    
-    
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;
