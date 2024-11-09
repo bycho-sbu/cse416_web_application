@@ -4,8 +4,8 @@ const app = express();
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
 
-app.listen(2424);
-console.log("Server listening on port 2424...");
+app.listen(2525);
+console.log("Server listening on port 2525...");
 
 // let mongoose = require("mongoose");
 // let mongoDB = "mongodb://127.0.0.1:27017/cse416";
