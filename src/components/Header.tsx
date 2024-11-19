@@ -1,5 +1,4 @@
 // Header.js
-import React from 'react';
 import { Link } from 'react-router-dom';
 import '../stylesheets/header.css';
 
@@ -10,7 +9,7 @@ function Header() {
       <div className="header-content">
         <h1 className="site-name">
             <Link to="/">
-                <a>BuildResume</a>
+                BuildResume
             </Link>
         </h1>
         <div className="nav-buttons">

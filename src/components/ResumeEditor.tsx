@@ -34,6 +34,10 @@ const ResumeEditor: React.FC = () => {
   const [showInfoForm, setShowInfoForm] = useState(false);
   const [formData, setFormData] = useState<FormData | null>(null);
 
+  const upload = () => {
+    console.log("123");
+  }
+
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       {/* Display the user's name if available */}
@@ -127,6 +131,7 @@ const ResumeEditor: React.FC = () => {
       >
         Input Information
       </button>
+      <button onClick={() => upload}>Upload</button>
     </div>
   );
 };

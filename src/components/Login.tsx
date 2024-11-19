@@ -1,25 +1,76 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+interface User {
+    name: string;
+}
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
 
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('http://localhost:2424/api/user', {
+          credentials: 'include',
+        });
+        const data = await response.json();
+  
+        if (response.ok) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.log('Error checking auth:', error);
+        setUser(null);
+      }
+    };
+  
+    checkAuth();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:2424/api/auth/logout', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+  
+      if (response.ok) {
+        setUser(null);
+        alert(data.message);
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+      alert('Error logging out. Please try again.');
+    }
+  };
+  
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:2424/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Include credentials for session management
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
-
+  
       if (response.ok) {
+        setUser(data.user); // Set the user state upon successful login
         alert(data.message);
       } else {
         alert('Error: ' + data.error);
@@ -35,7 +86,7 @@ export default function LoginPage() {
   const handleSignUp = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch('http://localhost:2424/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,10 +109,20 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/auth/google';  // Redirect to Google OAuth
+    window.location.href = 'http://localhost:2424/auth/google';
   };
 
-  return (
+  // User is logged in.
+  if (user) {
+    return (
+      <div className="container">
+        <h1>Welcome, {user.name}!</h1>
+        <button onClick={handleLogout} className="btn btn-primary">
+          Logout
+        </button>
+      </div>
+    );
+  } else return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
       <div className="card shadow" style={{ maxWidth: '400px', width: '100%' }}>
         <div className="card-body">

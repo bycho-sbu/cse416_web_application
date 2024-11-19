@@ -36,7 +36,7 @@ interface FormData {
 const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
   const [firstName, setFirstName] = useState('Sample');
   const [lastName, setLastName] = useState('Name');
-  const [email, setEmail] = useState('jamesbh.cho@gmail.com');
+  const [email, setEmail] = useState('sol.choi@stonybrook.edu');
   const [phone, setPhone] = useState('(555)123-4567');
   const [location, setLocation] = useState('City, State');
 
