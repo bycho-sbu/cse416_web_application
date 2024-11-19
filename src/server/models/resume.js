@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose"
 const { Schema } = mongoose;
 
 const resumeSchema = new Schema({
@@ -7,42 +7,38 @@ const resumeSchema = new Schema({
     ref: 'User', 
     required: true,
   },
-  title: {
-    type: String,
-    required: true,
-  },
-  personalInformation: {
-    fullName: String,
+  personalInformation: { //contact information
+    firstname: String,
+    lastname: String,
     email: String,
     phone: String,
     address: String,
   
   },
-  experience: [
+  experience: [ //work experience
     {
-      jobTitle: String,
-      company: String,
-      startDate: Date,
-      endDate: Date,
-      description: String,
+      jobTitle: String, //role
+      company: String,  //company
+      startDate: Date,  //start date
+      endDate: Date,    //end date 
+      description: String, //responsibilities
     },
   ],
   education: [
     {
       degree: String,
       institution: String,
-      graduationYear: Number,
-      description: String,
+      startDate: Date,
+      endDate: Date,
     },
   ],
   skills: [String], 
-  certifications: [String], 
-  feedbacks: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Feedback', 
-    },
-  ],
+
+  feedbacks: [{
+    reviewer: { type: String},
+    comment: { type: String},
+    date: { type: Date}
+  }],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -55,4 +51,4 @@ const resumeSchema = new Schema({
 
 const Resume = mongoose.model('Resume', resumeSchema);
 
-module.exports = Resume;
+export default Resume;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../App.css';
+import { submitResume } from '../api';
 
 interface EducationEntry {
   institution: string;
@@ -33,7 +34,7 @@ interface FormData {
     skills: string[];
   }
 
-const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
+const InfoForm: React.FC<InfoFormProps> = ({ onClose }) => {
   const [firstName, setFirstName] = useState('Sample');
   const [lastName, setLastName] = useState('Name');
   const [email, setEmail] = useState('jamesbh.cho@gmail.com');
@@ -100,10 +101,9 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
     setSkills(newSkills);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Perform validation or submit data
-    const data: FormData = {
+    const resumeData = {
       firstName,
       lastName,
       email,
@@ -114,8 +114,14 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
       experience,
       skills,
     };
-    onSubmit(data);
-    onClose();
+
+    try {
+      await submitResume(resumeData);  // Call the API to submit the resume data
+      alert('Resume submitted successfully!');
+      onClose();  // Close the form modal on successful submission
+    } catch (error) {
+      alert('There was an error submitting your resume. Please try again.');
+    }
   };
 
   return (

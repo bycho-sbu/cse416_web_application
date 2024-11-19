@@ -1,67 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'; // Use useLocation instead of useParams
 import '../stylesheets/Feedback.css';
+import { getFeedback, submitFeedback } from '../api'; 
 
 interface Feedback {
-  id: string;
-  reviewer: string;
+  reviewer: string,
   comment: string;
+  date: Date;
 }
 
-{/*   To be implemented later:
-      I am thinking maybe feedback page can be navigated via 
-      profile page and the feedboard page by pressing feedback button. 
-      The feedback page displays user's resume along with the feedback received. 
-      Also, depending on the user session == curr user.id,
-      if its their own resume -> display reply text box only
-      else(other user) -> display feedback textbox only*/}
-
-// placeholder for existing feedback data
-const dummyFeedback: Feedback[] = [
-  {
-    id: '1',
-    reviewer: 'Legend27',
-    comment: 'blahblahblah balh',
-  },
-  {
-    id: '2',
-    reviewer: 'Davidkimchi',
-    comment: 'blahblahblah balh',
-  },
-];
 
 export default function FeedbackPage() {
-  // 
-  const [feedbackList, setFeedbackList] = useState<Feedback[]>(dummyFeedback);
-  
-  // simulating session user data (will be replaced with actual session check)
-  const currentUserId: string = 'user123'; // placeholder for current user ID
-  const resumeOwnerId: string = 'user456'; // placeholder for resume owner's ID
+  const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
+  const [newFeedback, setNewFeedback] = useState<string>('');
+  const { resumeId } = useParams();
+  const currentUserId = 'user123'; //TODO actual userid(_id: ObjectId) of the current session
 
-  const handleReply = (feedbackId: string) => {
-    // logic for replying to a specific feedback (placeholder for now)
+  // fetching feedback with the resumeid
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      if (resumeId) {
+        const feedbackData = await getFeedback(resumeId);
+        setFeedbackList(feedbackData);
+        console.log("feedbackListsd", feedbackData);
+      }
+    };
+
+    if (resumeId) {
+      fetchFeedback();
+    }
+  }, [resumeId]); 
+
+  // submitting feedback to the resume
+  const handleSubmitFeedback = async () => {
+    if (newFeedback.trim() && resumeId) {
+      try {
+        await submitFeedback(resumeId, currentUserId, newFeedback);
+        setNewFeedback('');
+        const updatedFeedback = await getFeedback(resumeId);
+        setFeedbackList(updatedFeedback);
+      } catch (error) {
+        console.error('Error submitting feedback:', error);
+      }
+    }
   };
-
+  
   return (
     <div className="feedback-page">
       <h2 className="feedback-title">Feedback</h2>
 
       <div className="feedback-list">
-        {feedbackList.map((feedback) => (
-          <div key={feedback.id} className="feedback-card">
+      {feedbackList.length === 0 ? (
+        <p>No feedback yet.</p>
+      ) : (
+        feedbackList.map((feedback, index) => (
+          <div key={index} className="feedback-card">
             <p className="feedback-comment">{feedback.comment}</p>
             <p className="feedback-reviewer">- {feedback.reviewer}</p>
-            {currentUserId === resumeOwnerId && (
-              <button
-                onClick={() => handleReply(feedback.id)}
-                className="feedback-reply-button"
-              >
-                Reply
-              </button>
-            )}
+            <p className="feedback-date">{new Date(feedback.date).toLocaleDateString()}</p>
           </div>
-        ))}
+        ))
+      )}
+    </div>
+
+      <div className="feedback-submit-box">
+        <textarea
+          value={newFeedback}
+          onChange={(e) => setNewFeedback(e.target.value)}
+          placeholder="Leave feedback..."
+        />
+        <button onClick={handleSubmitFeedback} className="feedback-submit-button">
+          Submit Feedback
+        </button>
       </div>
-      
     </div>
   );
 }
