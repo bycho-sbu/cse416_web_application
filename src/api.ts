@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:2525'; 
 
+//fetching all resumes
 export const getResumes = async () => {
   try {
     const response = await axios.get(`${API_URL}/resumes`);
@@ -12,10 +13,15 @@ export const getResumes = async () => {
   }
 };
 
+//fetching one by userid
+export const getResume = async (userId: string) => {
+  const response = await axios.get(`${API_URL}/resume/${userId}`);
+  return response.data;
+};
+
 export const getFeedback = async (resumeId: string) => {
   try {
     const response = await axios.get(`${API_URL}/feedbacks/${resumeId}`);
-    console.log("Fetched feedback:", response.data); 
     return response.data;
   } catch (error) {
     console.error('Error fetching feedback:', error);
@@ -24,14 +30,15 @@ export const getFeedback = async (resumeId: string) => {
 };
 
 export const submitFeedback = async (resumeId: string, userId: string, comment: string) => {
-    console.log("resumeId",resumeId);
-    console.log("reviewer",userId);
-    console.log("comment",comment);
-
+ 
+    // check for mandatory input
+    if (!resumeId || !userId || !comment) {
+      throw new Error('All fields are required');
+    }
     try {
       const response = await axios.post(`${API_URL}/feedbacks`, {
         resumeId,
-        reviewer: userId,
+        userId,
         comment,
       });
       return response.data; 
@@ -42,13 +49,14 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
   };
   
   export const submitResume = async (resumeData: any) => {
+    console.log("resumedata",resumeData);
     try {
-      const response = await axios.post(`${API_URL}/resumes`, resumeData, {
+      const response = await axios.post(`${API_URL}/saveResume`, resumeData, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      return response.data; // Assuming backend returns data after successfully storing the resume
+      return response.data; 
     } catch (error) {
       console.error('Error submitting resume:', error);
       throw new Error('Failed to submit resume');

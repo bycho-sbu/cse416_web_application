@@ -24,6 +24,9 @@ const resumeSchema = new Schema({
       description: String, //responsibilities
     },
   ],
+  summary: {  //professional summary
+    type: String
+  },
   education: [
     {
       degree: String,
@@ -37,7 +40,7 @@ const resumeSchema = new Schema({
   feedbacks: [{
     reviewer: { type: String},
     comment: { type: String},
-    date: { type: Date}
+    date: { type: Date, default: Date.now}
   }],
   createdAt: {
     type: Date,

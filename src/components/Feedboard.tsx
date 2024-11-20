@@ -67,7 +67,7 @@ export default function Feedboard({ resumes }: FeedboardProps) {
             {/*  to be replaced with schema */}
             {currentItems.map((resume) => (
               <tr key={resume._id}>
-                <td>{resume.personalInformation.fullName}</td>
+                <td>{resume.personalInformation.firstname} {resume.personalInformation.lastname}</td>
                 <td>{resume.personalInformation.email}</td>
                 <td>{new Date(resume.createdAt).toLocaleDateString()}</td>
                 <td>

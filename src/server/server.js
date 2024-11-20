@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import Resume from './models/resume.js';
 import User from './models/user.js';
-import Feedback from './models/feedback.js';
 import mongoose from "mongoose"
 
 const app = express();
@@ -42,6 +41,21 @@ app.get("/resumes", async (req, res) => {
     }
   });
 
+//resume: fetching a resume by userId
+app.get('/resume/:userId', async (req, res) => {
+
+  let userId = new mongoose.Types.ObjectId(req.params.userId);
+  try {
+    const resume = await Resume.findOne({ userId });
+    if (!resume) {
+      return res.status(200).json(null); // user doesnt have a resume
+    }
+    res.status(200).json(resume);
+  } catch (error) {
+    console.error('Error fetching resume:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
   // fetch feedbacks for the resume
 app.get("/feedbacks/:resumeId", async (req, res) => {
     const resumeId = req.params.resumeId;
@@ -61,16 +75,18 @@ app.get("/feedbacks/:resumeId", async (req, res) => {
 // ---------------POST-------------------------
 // Route to submit feedback for a resume
 app.post("/feedbacks", async (req, res) => {
-    const { resumeId, reviewerId, comment } = req.body;
-  
+    const { resumeId, userId, comment } = req.body;
+    //TODO userid session
+    console.log(req.body);
     try {
       const resume = await Resume.findById(resumeId);
       if (!resume) {
         return res.status(404).send('Resume not found');
       }
-      const reviwerName = await User.findById(reviewerId);
+      // TODO SESSION reviewer.username
+      
       resume.feedbacks.push({
-        reviwerName, // TODO link with reviwer(current session id's name)
+        reviewer: userId,   // TODO link with reviwer(current session id's name)
         comment,
         date: new Date(), 
       });
@@ -84,29 +100,57 @@ app.post("/feedbacks", async (req, res) => {
   });
   
   // Route to save resume
-app.post("/resumes", async (req, res) => {
-  const { firstName, lastName, email, phone, location, summary, education, experience, skills, userId } = req.body;
+app.post("/saveResume", async (req, res) => {
+  const { firstName, lastName, email, phone, location, summary, education, experience, skills } = req.body;
   
-  
+  const userId = new mongoose.Types.ObjectId("9d2fe16262bd69b7ccf4f984"); // TODO
   try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+      let existingResume = await Resume.findOne({ userId });
+      
+      // update
+      if (existingResume) {
+      console.log("in update");  
+      existingResume.personalInformation.firstname = firstName;
+      existingResume.personalInformation.lastname = lastName;
+      existingResume.personalInformation.email = email;
+      existingResume.personalInformation.phone = phone;
+      existingResume.personalInformation.address = location;
+      existingResume.summary = summary;
+      existingResume.experience = experience;
+      existingResume.education = education;
+      existingResume.skills = skills;
+
+      await existingResume.save()
+      res.status(200).json(existingResume);  
+    } else {
+      console.log("in insert");  
+      // insert
       const newResume = new Resume({
-          userId,  // TODO
-          firstName,
-          lastName,
+        userId,
+        personalInformation: { 
+          firstname: firstName,
+          lastname: lastName,
           email,
           phone,
-          location,
-          summary,
-          education,
-          experience,
-          skills
+          address: location, 
+        },
+        summary,
+        experience,
+        education,
+        skills
       });
 
       await newResume.save();
 
-      res.status(201).json(newResume);  
+      res.status(201).json(newResume); 
+    }
+
   } catch (error) {
-      console.error("Error saving resume:", error);
-      res.status(500).send("Server error");
+    console.error("Error saving resume:", error);
+    res.status(500).send("Server error");
   }
 });

@@ -22,7 +22,6 @@ export default function FeedbackPage() {
       if (resumeId) {
         const feedbackData = await getFeedback(resumeId);
         setFeedbackList(feedbackData);
-        console.log("feedbackListsd", feedbackData);
       }
     };
 
