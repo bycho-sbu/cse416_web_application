@@ -58,8 +58,8 @@ async function startServer() {
                 resave: false,
                 saveUninitialized: true,
                 cookie: {
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax', // Adjust as needed
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'lax', // Adjust as needed
                 },
             })
         );
@@ -355,7 +355,7 @@ startServer();
 
 // Gracefully close MongoDB connection on app termination
 process.on('SIGINT', async () => {
-  console.log('\nClosing MongoDB connection...');
-  db.close();
-  process.exit(0);
+    console.log('\nClosing MongoDB connection...');
+    db.close();
+    process.exit(0);
 });
