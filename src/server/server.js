@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors'; // Import the cors package
 import bcrypt from 'bcrypt';
+import Groq from 'groq-sdk';
 
 import * as Resume from './models/resume.js';
 import * as User from './models/user.js';
@@ -15,6 +16,8 @@ import * as User from './models/user.js';
 dotenv.config();
 
 const app = express();
+
+// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Uncomment line 237 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 // Middleware to parse JSON and URL-encoded data
 app.use(express.urlencoded({ extended: true }));
@@ -39,6 +42,9 @@ if (!MONGODB_URI || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !SESSION_SECRE
 // MongoDB connection setup
 mongoose.connect(MONGODB_URI);
 let db = mongoose.connection;
+
+// AI setup
+const groq = new Groq({ apiKey: process.env.GROQ_APIKEY });
 
 // Start the server after connecting to the database
 async function startServer() {
@@ -233,16 +239,19 @@ async function startServer() {
 
         let userId = new mongoose.Types.ObjectId(req.params.userId);
         try {
-            const resume = await Resume.findOne({ userId });
-            if (!resume) {
-            return res.status(200).json(null); // user doesnt have a resume
-            }
-            res.status(200).json(resume);
+
+            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ to be uncommented @@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            // const resume = await Resume.findOne({ userId });
+            // if (!resume) {
+            // return res.status(200).json(null); // user doesnt have a resume
+            // }
+            // res.status(200).json(resume);
         } catch (error) {
             console.error('Error fetching resume:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
         });
+
         // fetch feedbacks for the resume
         app.get("/feedbacks/:resumeId", async (req, res) => {
             const resumeId = req.params.resumeId;
@@ -259,8 +268,36 @@ async function startServer() {
             }
         });
 
+        
         // ---------------POST-------------------------
         // Route to submit feedback for a resume
+        app.post("/generateSummary", async (req, res) => {
+            
+            try {
+                // Default
+                var content = "With following information, please provide professional and descriptive summary for resume: " + JSON.stringify(req.body);
+                // console.log(content);
+                const completion = await groq.chat.completions
+                    .create({
+                    messages: [
+                        {
+                            role: "system",
+                            content: content,
+                        },
+                    ],
+                        model: "llama3-8b-8192",
+                    })
+                    .then((chatCompletion) => {
+                        // console.log(chatCompletion.choices[0]?.message?.content || "No results");
+                        res.send(chatCompletion.choices[0]?.message?.content || "No results");
+                    });
+                // console.log(completion);
+            } catch(err) {
+                console.error(err);
+                res.status(500).send("Server error");
+            }
+        })
+        
         app.post("/feedbacks", async (req, res) => {
             const { resumeId, userId, comment } = req.body;
             //TODO userid session
@@ -288,58 +325,60 @@ async function startServer() {
         
         // Route to save resume
         app.post("/saveResume", async (req, res) => {
-        const { firstName, lastName, email, phone, location, summary, education, experience, skills } = req.body;
-        
-        const userId = new mongoose.Types.ObjectId("9d2fe16262bd69b7ccf4f984"); // TODO
-        try {
-            const user = await User.findById(userId);
-            if (!user) {
-                return res.status(404).send('User not found');
-            }
-            let existingResume = await Resume.findOne({ userId });
+            const { firstName, lastName, email, phone, location, summary, education, experience, skills } = req.body;
+
+            console.log(req.body);
             
-            // update
-            if (existingResume) {
-            console.log("in update");  
-            existingResume.personalInformation.firstname = firstName;
-            existingResume.personalInformation.lastname = lastName;
-            existingResume.personalInformation.email = email;
-            existingResume.personalInformation.phone = phone;
-            existingResume.personalInformation.address = location;
-            existingResume.summary = summary;
-            existingResume.experience = experience;
-            existingResume.education = education;
-            existingResume.skills = skills;
+            const userId = new mongoose.Types.ObjectId("9d2fe16262bd69b7ccf4f984"); // TODO
+            try {
+                const user = await User.findById(userId);
+                if (!user) {
+                    return res.status(404).send('User not found');
+                }
+                let existingResume = await Resume.findOne({ userId });
+                
+                // update
+                if (existingResume) {
+                console.log("in update");  
+                existingResume.personalInformation.firstname = firstName;
+                existingResume.personalInformation.lastname = lastName;
+                existingResume.personalInformation.email = email;
+                existingResume.personalInformation.phone = phone;
+                existingResume.personalInformation.address = location;
+                existingResume.summary = summary;
+                existingResume.experience = experience;
+                existingResume.education = education;
+                existingResume.skills = skills;
 
-            await existingResume.save()
-            res.status(200).json(existingResume);  
-            } else {
-            console.log("in insert");  
-            // insert
-            const newResume = new Resume({
-                userId,
-                personalInformation: { 
-                firstname: firstName,
-                lastname: lastName,
-                email,
-                phone,
-                address: location, 
-                },
-                summary,
-                experience,
-                education,
-                skills
-            });
+                await existingResume.save()
+                res.status(200).json(existingResume);  
+                } else {
+                console.log("in insert");  
+                // insert
+                const newResume = new Resume({
+                    userId,
+                    personalInformation: { 
+                    firstname: firstName,
+                    lastname: lastName,
+                    email,
+                    phone,
+                    address: location, 
+                    },
+                    summary,
+                    experience,
+                    education,
+                    skills
+                });
 
-            await newResume.save();
+                await newResume.save();
 
-            res.status(201).json(newResume); 
+                res.status(201).json(newResume); 
+                }
+
+            } catch (error) {
+                console.error("Error saving resume:", error);
+                res.status(500).send("Server error");
             }
-
-        } catch (error) {
-            console.error("Error saving resume:", error);
-            res.status(500).send("Server error");
-        }
         });
 
         // Start the server after DB connection is established

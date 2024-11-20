@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { FormData } from './components/ResumeEditor';
+
+// @@@@@@@@@@@@@@@@@ line 56 uncomment @@@@@@@@@@@@@@@@@@@
 
 const API_URL = 'http://localhost:2424'; 
 
@@ -47,16 +50,29 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
       throw error;  
     }
   };
+
+  export const generateSummary = async (resumeInfo: FormData | any): Promise<string> => {
+    try {
+      console.log("RESUME:", resumeInfo.personalInformation);
+      const response = await axios.post(`${API_URL}/generateSummary`, resumeInfo.personalInformation);
+      console.log("Response:", response.data);
+      return response.data; // Return the data from the API response
+    } catch (error) {
+      console.error("Error:", error);
+      return ""; // Return an empty string or handle the error as needed
+    }
+  };
   
   export const submitResume = async (resumeData: any) => {
     console.log("resumedata",resumeData);
     try {
-      const response = await axios.post(`${API_URL}/saveResume`, resumeData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      return response.data; 
+        //@@@@@@@@@@@@@@@@@@@@@@@@@ To be uncommented @@@@@@@@@@@@@@@@@@@@@@@@@
+    //   const response = await axios.post(`${API_URL}/saveResume`, resumeData, {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   });
+    //   return response.data; 
     } catch (error) {
       console.error('Error submitting resume:', error);
       throw new Error('Failed to submit resume');
