@@ -1,70 +1,47 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import '../stylesheets/Feedboard.css'
 
-// temporary interface to hold resume details 
-interface Resume {
-  id: string;
-  name: string;
-  jobTitle: string;
-  company: string;
-  email: string;
-  dateCreated: string;
+// destructuring resumes
+interface FeedboardProps {
+  resumes: any[];
 }
 
-export default function Feedboard() {
-  const [resumes, setResumes] = useState<Resume[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
+export default function Feedboard({ resumes }: FeedboardProps) {
+
   const [sortOrder, setSortOrder] = useState('newest')
   const [currentPage, setCurrentPage] = useState(1)
-  // TODO
-  const itemsPerPage = 2
-
-  useEffect(() => {
-    // to be replaced with schema
-    const dummyData: Resume[] = [
-      { id: '1', name: 'john1223', jobTitle: 'software engineer', company: 'Google', email: 'john@gmail.com', dateCreated: '2024-10-25' },
-      { id: '2', name: 'andrew3', jobTitle: 'software engineer', company: 'Amazon', email: 'andrew@gmail.com', dateCreated: '2024-10-24' },
-      { id: '3', name: 'kenny', jobTitle: 'ceo', company: 'xyz', email: 'kenny@gmail.com', dateCreated: '2024-10-23' },
-    ]
-    setResumes(dummyData)
-  }, [])
-
-  // searching 
-  // filtering by jobTitle
-  // most people would look up by job
-  const filteredResumes = resumes.filter(resume =>
-    resume.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const itemsPerPage = 5
+  const navigate = useNavigate();
 
   // button action 
-  const sortedResumes = [...filteredResumes].sort((a, b) => {
+  const sortedResumes = resumes.sort((a, b) => {
     if (sortOrder === 'newest') {
-      return new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime()
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     } else {
-      return new Date(a.dateCreated).getTime() - new Date(b.dateCreated).getTime()
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     }
   })
-  // pagination const
+  // pagination logic
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentItems = sortedResumes.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(sortedResumes.length / itemsPerPage)
+
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
   }
 
+  //navigate to feedback
+  const handleViewFeedback = (resumeId: string) => {
+    navigate(`/feedback/${resumeId}`); 
+  };
+  
+
   return (
     <div className="feedboard">
-      <h2 className="feedboard-title">All Resume</h2>
+      <h2 className="feedboard-title">Feedboard</h2>
       <div className="feedboard-controls">
-        {/*  searching */}
-        <input
-          type="search"
-          placeholder="Search..."
-          className="feedboard-search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
 
         {/* filtering old/new buttons */}
         <select
@@ -81,8 +58,6 @@ export default function Feedboard() {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Job Title</th>
-              <th>Company</th>
               <th>Email</th>
               <th>Date Created</th>
               <th>Action</th>
@@ -91,15 +66,14 @@ export default function Feedboard() {
           <tbody>
             {/*  to be replaced with schema */}
             {currentItems.map((resume) => (
-              <tr key={resume.id}>
-                <td>{resume.name}</td>
-                <td>{resume.jobTitle}</td>
-                <td>{resume.company}</td>
-                <td>{resume.email}</td>
-                <td>{new Date(resume.dateCreated).toLocaleDateString()}</td>
+              <tr key={resume._id}>
+                <td>{resume.personalInformation.firstname} {resume.personalInformation.lastname}</td>
+                <td>{resume.personalInformation.email}</td>
+                <td>{new Date(resume.createdAt).toLocaleDateString()}</td>
                 <td>
-                {/* to be implemented */}
-                  <button className="feedboard-button">View Resume</button>
+                {/* navigate to feedback */}
+                  <button className="feedboard-button"
+                  onClick={() => handleViewFeedback(resume._id)}>View Feedback</button>
                 </td>
               </tr>
             ))}
@@ -133,7 +107,7 @@ export default function Feedboard() {
         <button 
           className="feedboard-page-button" 
           onClick={() => handlePageChange(currentPage + 1)} 
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || totalPages < 1}
         >
           &gt;               
           {/* greater than */}

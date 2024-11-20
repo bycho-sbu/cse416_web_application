@@ -1,76 +1,119 @@
 .feedback-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 80vh;
-    padding: 20px;
-    text-align: left;
-  }
-  
-  .feedback-title {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    
-  }
-  
-  .feedback-input {
-    width: 100%;
-    max-width: 800px;
-    min-height: 100px;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    resize: vertical;
-  }
-  
-  .feedback-submit-button {
-    background-color: #000;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 20px;
-  }
-  
-  .feedback-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-    max-width: 800px;
-  }
-  
-  .feedback-card {
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-  }
-  
-  .feedback-comment {
-    font-size: 1rem;
-    margin: 10px 0;
-    color: #555;
-  }
-  
-  .feedback-reviewer {
-    text-align: right;
-    font-size: 0.9rem;
-    color: #888;
-  }
-  
-  .feedback-reply-button {
-    background-color: #000;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-top: 10px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+  text-align: left;
+}
+
+.feedback-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.feedback-input {
+  width: 100%;
+  max-width: 800px;
+  min-height: 100px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.feedback-input:focus {
+  border-color: #305ceb;
+  outline: none;
+}
+
+.feedback-submit-button {
+  background-color: #305ceb;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.feedback-submit-button:hover {
+  background-color: #021d75;
+}
+
+.feedback-submit-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 30px;
+}
+
+.feedback-card {
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: box-shadow 0.3s ease;
+}
+
+.feedback-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-comment {
+  font-size: 1rem;
+  margin: 10px 0;
+  color: #555;
+}
+
+.feedback-reviewer {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.feedback-date {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #ccc;
+}
+
+.feedback-submit-box {
+  width: 100%;
+  max-width: 800px;
+  padding-top: 20px;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+  border-color: #305ceb;
+  outline: none;
+}
+
+.feedback-label {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #333;
+}

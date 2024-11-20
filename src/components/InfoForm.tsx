@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../App.css';
+import { submitResume } from '../api';
 
 interface EducationEntry {
   institution: string;
@@ -10,52 +11,60 @@ interface EducationEntry {
 
 interface ExperienceEntry {
   company: string;
-  role: string;
+  jobTitle: string;
   startDate: string;
   endDate: string;
-  responsibilities: string;
+  description: string;
 }
 
 interface InfoFormProps {
   onClose: () => void;
   onSubmit: (data: FormData) => void;
+  initialData: FormData | null; 
 }
 
 interface FormData {
-    firstName: string;
-    lastName: string;
+  personalInformation: {
+    firstname: string;
+    lastname: string;
     email: string;
     phone: string;
-    location: string;
-    summary: string;
-    education: EducationEntry[];
-    experience: ExperienceEntry[];
-    skills: string[];
-  }
+    address: string;
+  };
+  experience: {
+    jobTitle: string;
+    company: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
+  summary: string;
+  education: {
+    degree: string;
+    institution: string;
+    startDate: string;
+    endDate: string;
+  }[];
+  skills: string[];
+  feedbacks: {
+    reviewer: string;
+    comment: string;
+    date: string;
+  }[]; 
+}
 
-const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
-  const [firstName, setFirstName] = useState('Sample');
-  const [lastName, setLastName] = useState('Name');
-  const [email, setEmail] = useState('sol.choi@stonybrook.edu');
-  const [phone, setPhone] = useState('(555)123-4567');
-  const [location, setLocation] = useState('City, State');
+const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData }) => {
+  const [firstName, setFirstName] = useState(initialData?.personalInformation.firstname || '');
+  const [lastName, setLastName] = useState(initialData?.personalInformation.lastname || '');
+  const [email, setEmail] = useState(initialData?.personalInformation.email || '');
+  const [phone, setPhone] = useState(initialData?.personalInformation.phone || '');
+  const [location, setLocation] = useState(initialData?.personalInformation.address || '');
+  const [summary, setSummary] = useState(initialData?.summary || '');
+  const [education, setEducation] = useState<EducationEntry[]>(initialData?.education || []);
+  const [experience, setExperience] = useState<ExperienceEntry[]>(initialData?.experience || []);
+  const [skills, setSkills] = useState<string[]>(initialData?.skills || []);
 
-  // New fields for resume
-  const [summary, setSummary] = useState('');
-  const [education, setEducation] = useState<EducationEntry[]>([
-    { institution: '', degree: '', startDate: '', endDate: '' },
-  ]);
-  const [experience, setExperience] = useState<ExperienceEntry[]>([
-    {
-      company: '',
-      role: '',
-      startDate: '',
-      endDate: '',
-      responsibilities: '',
-    },
-  ]);
-  const [skills, setSkills] = useState<string[]>(['']);
-
+  console.log("FormData",initialData);
   // Methods to add entries
   const handleAddEducation = () => {
     setEducation([
@@ -69,10 +78,10 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
       ...experience,
       {
         company: '',
-        role: '',
+        jobTitle: '',
         startDate: '',
         endDate: '',
-        responsibilities: '',
+        description: '',
       },
     ]);
   };
@@ -99,23 +108,43 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
     newSkills.splice(index, 1);
     setSkills(newSkills);
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Perform validation or submit data
-    const data: FormData = {
-      firstName,
-      lastName,
-      email,
-      phone,
-      location,
-      summary,
-      education,
-      experience,
-      skills,
+    const resumeData: FormData = {
+      personalInformation: {
+        firstname: firstName,
+        lastname: lastName,
+        email: email,
+        phone: phone,
+        address: location,
+      },
+      experience: experience.map((exp) => ({
+        jobTitle: exp.jobTitle,
+        company: exp.company,
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+        description: exp.description,
+      })),
+      summary: summary,
+      education: education.map((edu) => ({
+        degree: edu.degree,
+        institution: edu.institution,
+        startDate: edu.startDate,
+        endDate: edu.endDate,
+      })),
+      skills: skills,
+      feedbacks: [], // Optional: You can populate feedbacks if needed
     };
-    onSubmit(data);
-    onClose();
+    
+
+    try {
+      await submitResume(resumeData);  // Call the API to submit the resume data
+      alert('Resume submitted successfully!');
+      onSubmit(resumeData); 
+      onClose();  // Close the form modal on successful submission
+    } catch (error) {
+      alert('There was an error submitting your resume. Please try again.');
+    }
   };
 
   return (
@@ -343,10 +372,10 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
                 <label htmlFor={`role-${index}`}>Role</label>
                 <input
                   id={`role-${index}`}
-                  value={exp.role}
+                  value={exp.jobTitle}
                   onChange={(e) => {
                     const newExperience = [...experience];
-                    newExperience[index].role = e.target.value;
+                    newExperience[index].jobTitle = e.target.value;
                     setExperience(newExperience);
                   }}
                   style={{ width: '100%' }}
@@ -389,12 +418,12 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit }) => {
                 </label>
                 <textarea
                   id={`responsibilities-${index}`}
-                  value={exp.responsibilities}
+                  value={exp.description}
                   onChange={(e) => {
                     const newExperience = [...experience];
                     newExperience[
                       index
-                    ].responsibilities = e.target.value;
+                    ].description = e.target.value;
                     setExperience(newExperience);
                   }}
                   placeholder="Describe your responsibilities and achievements."

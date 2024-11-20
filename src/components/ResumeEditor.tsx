@@ -1,57 +1,108 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect  } from 'react';
 import InfoForm from './InfoForm';
 import Section from './Section';
-
+import { getResume } from '../api';
 // Import or define the interfaces used in InfoForm
-interface EducationEntry {
-  institution: string;
-  degree: string;
-  startDate: string;
-  endDate: string;
-}
-
-interface ExperienceEntry {
-  company: string;
-  role: string;
-  startDate: string;
-  endDate: string;
-  responsibilities: string;
-}
 
 interface FormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  location: string;
+  personalInformation: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  experience: {
+    jobTitle: string;
+    company: string;
+    startDate: string;
+    endDate: string;
+    description: string;
+  }[];
   summary: string;
-  education: EducationEntry[];
-  experience: ExperienceEntry[];
+  education: {
+    degree: string;
+    institution: string;
+    startDate: string;
+    endDate: string;
+  }[];
   skills: string[];
+  feedbacks: {
+    reviewer: string;
+    comment: string;
+    date: string;
+  }[]; 
 }
+
 
 const ResumeEditor: React.FC = () => {
   const [showInfoForm, setShowInfoForm] = useState(false);
   const [formData, setFormData] = useState<FormData | null>(null);
+  const userId = '9d2fe16262bd69b7ccf4f984'; 
 
-  const upload = () => {
-    console.log("123");
-  }
+  // Fetch resume data on load
+  useEffect(() => {
+    const fetchResume = async () => {
+      try {
+        const data = await getResume(userId); 
+        if (data == null || !data) {
+          alert('No resume found for this user.\nPlease enter the fields to create new resume.');
+          setFormData(null); 
+          return;
+        }   
+        const transformedData: FormData = {
+          personalInformation: {
+            firstname: data.personalInformation?.firstname || '',
+            lastname: data.personalInformation?.lastname || '',
+            email: data.personalInformation?.email || '',
+            phone: data.personalInformation?.phone || '',
+            address: data.personalInformation?.address || '',
+          },
+          experience: data.experience?.map((exp: any) => ({
+            jobTitle: exp.jobTitle || '',
+            company: exp.company || '',
+            startDate: exp.startDate || '',
+            endDate: exp.endDate || '',
+            description: exp.description || '',
+          })) || [],
+          summary: data.summary || '',
+          education: data.education?.map((edu: any) => ({
+            degree: edu.degree || '',
+            institution: edu.institution || '',
+            startDate: edu.startDate || '',
+            endDate: edu.endDate || '',
+          })) || [],
+          skills: data.skills || [],
+          feedbacks: data.feedbacks?.map((feedback: any) => ({
+            reviewer: feedback.reviewer || '',
+            comment: feedback.comment || '',
+            date: feedback.date || '',
+          })) || [],
+        };
 
+        setFormData(transformedData); // Update the state
+      } catch (error) {
+        console.error('Error fetching resume:', error);
+      }
+    };
+
+    fetchResume();
+  }, [userId]);
+  
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       {/* Display the user's name if available */}
       <h1>
         {formData
-          ? `${formData.firstName} ${formData.lastName}’s Resume`
+          ? `${formData.personalInformation.firstname} ${formData.personalInformation.lastname}’s Resume`
           : 'Your Name’s Resume'}
       </h1>
 
       {/* Personal Section */}
-      <Section title="Personal">
+      <Section title="Contact Information">
         {formData ? (
           <p>
-            {formData.phone} | {formData.email} | {formData.location}
+            {formData.personalInformation.phone} | {formData.personalInformation.email} | {formData.personalInformation.address}
           </p>
         ) : (
           <p>Phone Number | Email | Location</p>
@@ -72,11 +123,11 @@ const ResumeEditor: React.FC = () => {
         {formData ? (
           formData.experience.map((exp, index) => (
             <div key={index} style={{ marginBottom: '15px' }}>
-              <h3>{exp.role} at {exp.company}</h3>
+              <h3>{exp.jobTitle} at {exp.company}</h3>
               <p>
                 {exp.startDate} - {exp.endDate}
               </p>
-              <p>{exp.responsibilities}</p>
+              <p>{exp.description}</p>
             </div>
           ))
         ) : (
@@ -117,10 +168,11 @@ const ResumeEditor: React.FC = () => {
       {showInfoForm && (
         <InfoForm
           onClose={() => setShowInfoForm(false)}
-          onSubmit={(data) => {
+          onSubmit={(data:FormData) => {
             setFormData(data);
             setShowInfoForm(false);
           }}
+          initialData={formData}
         />
       )}
 
