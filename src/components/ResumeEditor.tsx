@@ -183,7 +183,6 @@ const ResumeEditor: React.FC = () => {
       >
         Input Information
       </button>
-      <button onClick={() => upload}>Upload</button>
     </div>
   );
 };
