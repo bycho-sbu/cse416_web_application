@@ -9,8 +9,8 @@ import dotenv from 'dotenv';
 import cors from 'cors'; // Import the cors package
 import bcrypt from 'bcrypt';
 
-import Resume from './models/resume.js';
-import User from './models/user.js';
+import * as Resume from './models/resume.js';
+import * as User from './models/user.js';
 
 dotenv.config();
 
@@ -37,15 +37,19 @@ if (!MONGODB_URI || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !SESSION_SECRE
 }
 
 // MongoDB connection setup
+mongoose.connect(MONGODB_URI);
+let db = mongoose.connection;
 
 // Start the server after connecting to the database
 async function startServer() {
     try {
-        mongoose.connect(MONGODB_URI);
-        let db = mongoose.connection;
+        // db = client.db('CSE416-Project'); // Replace with your database name
+        // console.log('Connected to MongoDB');
 
-        db = client.db('CSE416-Project'); // Replace with your database name
-        console.log('Connected to MongoDB');
+        db.on("error", console.error.bind(console, "MongoDB connection error:"));
+        db.on("connected", () => {
+            console.log("Connected to database");
+        });
 
         // Session setup
         app.use(
@@ -352,6 +356,6 @@ startServer();
 // Gracefully close MongoDB connection on app termination
 process.on('SIGINT', async () => {
   console.log('\nClosing MongoDB connection...');
-  await client.close();
+  db.close();
   process.exit(0);
 });
