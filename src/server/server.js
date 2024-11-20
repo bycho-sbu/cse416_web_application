@@ -146,8 +146,8 @@ async function startServer() {
             res.json({ message: 'Logged in successfully', user });
         });
         } catch (err) {
-        console.error('Login Error:', err);
-        res.status(500).json({ error: 'An error occurred during login' });
+            console.error('Login Error:', err);
+            res.status(500).json({ error: 'An error occurred during login' });
         }
     });
 
@@ -178,6 +178,7 @@ async function startServer() {
     
         const newUser = {
             email,
+            name: email.slice(0, email.indexOf("@")),
             password: hashedPassword,
             createdAt: new Date(),
         };
