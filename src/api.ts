@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:2525'; 
+const API_URL = 'http://localhost:2424'; 
 
 //fetching all resumes
 export const getResumes = async () => {
