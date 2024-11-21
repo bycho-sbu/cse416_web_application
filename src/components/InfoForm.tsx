@@ -21,6 +21,7 @@ interface InfoFormProps {
   onClose: () => void;
   onSubmit: (data: FormData) => void;
   initialData: FormData | null; 
+  currentUserId: string | null;
 }
 
 interface FormData {
@@ -53,7 +54,7 @@ interface FormData {
   }[]; 
 }
 
-const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData }) => {
+const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData, currentUserId }) => {
   const [firstName, setFirstName] = useState(initialData?.personalInformation.firstname || '');
   const [lastName, setLastName] = useState(initialData?.personalInformation.lastname || '');
   const [email, setEmail] = useState(initialData?.personalInformation.email || '');
@@ -64,7 +65,7 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData }) =
   const [experience, setExperience] = useState<ExperienceEntry[]>(initialData?.experience || []);
   const [skills, setSkills] = useState<string[]>(initialData?.skills || []);
 
-  console.log("FormData",initialData);
+  console.log("currentUserId",currentUserId);
   // Methods to add entries
   const handleAddEducation = () => {
     setEducation([
@@ -133,15 +134,15 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData }) =
         endDate: edu.endDate,
       })),
       skills: skills,
-      feedbacks: [], // Optional: You can populate feedbacks if needed
+      feedbacks: [], 
     };
     
 
     try {
-      await submitResume(resumeData);  // Call the API to submit the resume data
+      await submitResume(resumeData); 
       alert('Resume submitted successfully!');
       onSubmit(resumeData); 
-      onClose();  // Close the form modal on successful submission
+      onClose(); 
     } catch (error) {
       alert('There was an error submitting your resume. Please try again.');
     }

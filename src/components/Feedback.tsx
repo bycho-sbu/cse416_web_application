@@ -14,7 +14,25 @@ export default function FeedbackPage() {
   const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
   const [newFeedback, setNewFeedback] = useState<string>('');
   const { resumeId } = useParams();
-  const currentUserId = 'user123'; //TODO actual userid(_id: ObjectId) of the current session
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch('/api/user');
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentUserId(data.user._id || ''); 
+        } else {
+          console.error('Failed to fetch user info. Status:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   // fetching feedback with the resumeid
   useEffect(() => {
@@ -32,7 +50,7 @@ export default function FeedbackPage() {
 
   // submitting feedback to the resume
   const handleSubmitFeedback = async () => {
-    if (newFeedback.trim() && resumeId) {
+    if (newFeedback.trim() && resumeId && currentUserId) {
       try {
         await submitFeedback(resumeId, currentUserId, newFeedback);
         setNewFeedback('');

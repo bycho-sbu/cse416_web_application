@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:2525'; 
+const API_URL = 'http://localhost:2424'; 
 
 //fetching all resumes
 export const getResumes = async () => {
@@ -60,5 +60,15 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
     } catch (error) {
       console.error('Error submitting resume:', error);
       throw new Error('Failed to submit resume');
+    }
+  };
+
+  export const fetchCurrentUser = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/usertest`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch current user', error);
+      throw new Error('Failed to fetch current user');
     }
   };

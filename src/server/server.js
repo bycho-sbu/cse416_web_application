@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import cors from 'cors'; // Import the cors package
 import bcrypt from 'bcrypt';
 
-import * as Resume from './models/resume.js';
+import Resume from './models/resume.js';
 import * as User from './models/user.js';
 
 dotenv.config();
@@ -60,6 +60,7 @@ async function startServer() {
                 cookie: {
                     secure: process.env.NODE_ENV === 'production',
                     sameSite: 'lax', // Adjust as needed
+                    maxAge: 24 * 60 * 60 * 1000,
                 },
             })
         );
@@ -151,7 +152,15 @@ async function startServer() {
                     if (err) {
                     return res.status(500).json({ error: 'Login failed' });
                     }
+                    console.log("session after logging in: ", req.session);
+                    console.log("sessionid after logging in: ", req.sessionID);
                     res.json({ message: 'Logged in successfully', user });
+                    req.session.user = { id: user._id, email: user.email};
+                    console.log("session at logging in: ", req.session);
+                    console.log("userinfo logging in: ",req.session.user);
+                    console.log("sessionid logging in: ",req.sessionID);
+                    console.log("passport user: ", req.session.passport.user);
+                
                 });
             } catch (err) {
                 console.error('Login Error:', err);
@@ -209,11 +218,29 @@ async function startServer() {
 
         // Route to get user info
         app.get('/api/user', (req, res) => {
+            //console.log("in api user");
+            //console.log("sessionid: ",req.sessionID);
             if (req.isAuthenticated()) {
+                //console.log("userinfo: ",req.user);
                 res.json({ user: req.user });
+                
+            } else {
+                //console.log("user not authenticated");
+                res.status(401).json({ error: 'Unauthorized' });
+            }
+        });
+
+        app.get('/api/usertest', (req, res) => {
+            console.log("userinfo resume: ", req.session.user);
+            console.log("session id at resume: ",req.sessionID);
+            console.log("session at resume: ", req.session);
+            console.log("passport user: ", req.session.passport.user);
+            if (req.session.user) {
+                res.json({ userId: req.session.user.id });
             } else {
                 res.status(401).json({ error: 'Unauthorized' });
             }
+        
         });
 
         //------------------GET------------------------
@@ -230,18 +257,21 @@ async function startServer() {
 
         //resume: fetching a resume by userId
         app.get('/resume/:userId', async (req, res) => {
-
-        let userId = new mongoose.Types.ObjectId(req.params.userId);
-        try {
-            const resume = await Resume.findOne({ userId });
-            if (!resume) {
-            return res.status(200).json(null); // user doesnt have a resume
+            console.log("userinfo resumeeditor: ", req.session.user);
+            console.log("session id at resumeeditor: ",req.sessionID);
+            console.log("session at resumeeditor: ", req.session);
+            console.log("passport user: ", req.session.passport.user);
+            let userId = new mongoose.Types.ObjectId(req.session.user.id);
+            try {
+                const resume = await Resume.findOne({ userId });
+                if (!resume) {
+                return res.status(200).json(null); // user doesnt have a resume
+                }
+                res.status(200).json(resume);
+            } catch (error) {
+                console.error('Error fetching resume:', error);
+                res.status(500).json({ error: 'Internal server error' });
             }
-            res.status(200).json(resume);
-        } catch (error) {
-            console.error('Error fetching resume:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
         });
         // fetch feedbacks for the resume
         app.get("/feedbacks/:resumeId", async (req, res) => {
@@ -262,9 +292,13 @@ async function startServer() {
         // ---------------POST-------------------------
         // Route to submit feedback for a resume
         app.post("/feedbacks", async (req, res) => {
-            const { resumeId, userId, comment } = req.body;
+            const { resumeId, comment } = req.body;
+
+            if (!req.isAuthenticated()) {
+                return res.status(401).json({ error: "Unauthorized" });
+            }
             //TODO userid session
-            console.log(req.body);
+            console.log(req.user._id);
             try {
                 const resume = await Resume.findById(resumeId);
                 if (!resume) {
@@ -273,7 +307,7 @@ async function startServer() {
                 // TODO SESSION reviewer.username
                 
                 resume.feedbacks.push({
-                    reviewer: userId,   // TODO link with reviwer(current session id's name)
+                    reviewer: req.user._id,   //  link with reviwer(current session id's name)
                     comment,
                     date: new Date(), 
                 });
@@ -289,8 +323,8 @@ async function startServer() {
         // Route to save resume
         app.post("/saveResume", async (req, res) => {
         const { firstName, lastName, email, phone, location, summary, education, experience, skills } = req.body;
-        
-        const userId = new mongoose.Types.ObjectId("9d2fe16262bd69b7ccf4f984"); // TODO
+        console.log(req.user);
+        const userId = req.user._id;
         try {
             const user = await User.findById(userId);
             if (!user) {

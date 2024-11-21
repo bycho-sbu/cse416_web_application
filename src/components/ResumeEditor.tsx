@@ -2,6 +2,7 @@ import React, { useState,useEffect  } from 'react';
 import InfoForm from './InfoForm';
 import Section from './Section';
 import { getResume } from '../api';
+import { fetchCurrentUser } from '../api';
 // Import or define the interfaces used in InfoForm
 
 interface FormData {
@@ -38,13 +39,30 @@ interface FormData {
 const ResumeEditor: React.FC = () => {
   const [showInfoForm, setShowInfoForm] = useState(false);
   const [formData, setFormData] = useState<FormData | null>(null);
-  const userId = '9d2fe16262bd69b7ccf4f984'; 
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userId = await fetchCurrentUser(); 
+        console.log('Fetched current userid:', userId);
+        setCurrentUserId(userId || ''); 
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+
+    fetchUser();
+  }, []);
   // Fetch resume data on load
   useEffect(() => {
     const fetchResume = async () => {
+      if (!currentUserId) {
+        console.warn('User ID is null. Cannot fetch resume.'); // null check since user who hasnt login can access
+        return;
+      }
       try {
-        const data = await getResume(userId); 
+        const data = await getResume(currentUserId); 
         if (data == null || !data) {
           alert('No resume found for this user.\nPlease enter the fields to create new resume.');
           setFormData(null); 
@@ -87,7 +105,7 @@ const ResumeEditor: React.FC = () => {
     };
 
     fetchResume();
-  }, [userId]);
+  }, [currentUserId]);
   
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
@@ -173,6 +191,7 @@ const ResumeEditor: React.FC = () => {
             setShowInfoForm(false);
           }}
           initialData={formData}
+          currentUserId={currentUserId}
         />
       )}
 
