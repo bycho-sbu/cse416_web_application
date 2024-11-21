@@ -88,15 +88,16 @@ async function startServer() {
                     let user = await db.collection('users').findOne({ email });
 
                     if (!user) {
-                    const newUser = {
-                        email,
-                        name: profile.displayName,
-                        googleId: profile.id,
-                        createdAt: new Date(),
-                    };
-                    const result = await db.collection('users').insertOne(newUser);
-                    newUser._id = result.insertedId;
-                    user = newUser;
+                        const newUser = {
+                            email,
+                            name: profile.displayName,
+                            googleId: profile.id,
+                            createdAt: new Date(),
+                        };
+                        
+                        const result = await db.collection('users').insertOne(newUser);
+                        newUser._id = result.insertedId;
+                        user = newUser;
                     }
 
                     return done(null, user);
@@ -226,8 +227,8 @@ async function startServer() {
         // feedboard: fetch all resumes
         app.get("/resumes", async (req, res) => {
             try {
-                const resumes = await Resume.find(); 
-                res.status(200).json(resumes);
+                // const resumes = await Resume.find(); 
+                // res.status(200).json(resumes);
             } catch (err) {
                 console.error("Error fetching resumes:", err);
                 res.status(500).send("Server error");
@@ -276,7 +277,7 @@ async function startServer() {
             try {
                 // Default
                 var content = "With following information, please provide professional and descriptive summary for resume: " + JSON.stringify(req.body);
-                // console.log(content);
+                console.log(content);
                 const completion = await groq.chat.completions
                     .create({
                     messages: [

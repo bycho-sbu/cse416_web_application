@@ -53,8 +53,8 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
 
   export const generateSummary = async (resumeInfo: FormData | any): Promise<string> => {
     try {
-      console.log("RESUME:", resumeInfo.personalInformation);
-      const response = await axios.post(`${API_URL}/generateSummary`, resumeInfo.personalInformation);
+      console.log("RESUME:", resumeInfo);
+      const response = await axios.post(`${API_URL}/generateSummary`, resumeInfo);
       console.log("Response:", response.data);
       return response.data; // Return the data from the API response
     } catch (error) {
