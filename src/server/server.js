@@ -10,12 +10,12 @@ import cors from 'cors'; // Import the cors package
 import bcrypt from 'bcrypt';
 
 import Resume from './models/resume.js';
-import * as User from './models/user.js';
+import User from './models/user.js';
 
 dotenv.config();
 
 const app = express();
-
+let userId = '';
 // Middleware to parse JSON and URL-encoded data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -152,15 +152,8 @@ async function startServer() {
                     if (err) {
                     return res.status(500).json({ error: 'Login failed' });
                     }
-                    console.log("session after logging in: ", req.session);
-                    console.log("sessionid after logging in: ", req.sessionID);
                     res.json({ message: 'Logged in successfully', user });
-                    req.session.user = { id: user._id, email: user.email};
-                    console.log("session at logging in: ", req.session);
-                    console.log("userinfo logging in: ",req.session.user);
-                    console.log("sessionid logging in: ",req.sessionID);
-                    console.log("passport user: ", req.session.passport.user);
-                
+                    userId = user._id;
                 });
             } catch (err) {
                 console.error('Login Error:', err);
@@ -218,32 +211,28 @@ async function startServer() {
 
         // Route to get user info
         app.get('/api/user', (req, res) => {
-            //console.log("in api user");
-            //console.log("sessionid: ",req.sessionID);
             if (req.isAuthenticated()) {
-                //console.log("userinfo: ",req.user);
-                res.json({ user: req.user });
-                
-            } else {
-                //console.log("user not authenticated");
-                res.status(401).json({ error: 'Unauthorized' });
-            }
-        });
-
-        app.get('/api/usertest', (req, res) => {
-            console.log("userinfo resume: ", req.session.user);
-            console.log("session id at resume: ",req.sessionID);
-            console.log("session at resume: ", req.session);
-            console.log("passport user: ", req.session.passport.user);
-            if (req.session.user) {
-                res.json({ userId: req.session.user.id });
+                res.json({ user: req.user });   
             } else {
                 res.status(401).json({ error: 'Unauthorized' });
             }
-        
         });
-
         //------------------GET------------------------
+        app.get('/fetchCurrentUser', (req, res) => {
+            res.json({ userId: userId });
+        });
+
+        app.get('/getUserName', async (req,res) => {
+            try {
+                const user = await User.findById(userId); 
+                console.log("in server",user);
+                res.status(200).json({userName : user.name});
+                
+            } catch (err) {
+                console.error("Error fetching user information:", err);
+                res.status(500).send("Server error");
+            }
+        });
         // feedboard: fetch all resumes
         app.get("/resumes", async (req, res) => {
             try {
@@ -255,15 +244,25 @@ async function startServer() {
             }
         });
 
-        //resume: fetching a resume by userId
-        app.get('/resume/:userId', async (req, res) => {
-            console.log("userinfo resumeeditor: ", req.session.user);
-            console.log("session id at resumeeditor: ",req.sessionID);
-            console.log("session at resumeeditor: ", req.session);
-            console.log("passport user: ", req.session.passport.user);
-            let userId = new mongoose.Types.ObjectId(req.session.user.id);
+        //resumeeditor: fetching a resume by userId
+        app.get('/resume', async (req, res) => {
             try {
                 const resume = await Resume.findOne({ userId });
+                if (!resume) {
+                return res.status(200).json(null); // user doesnt have a resume
+                }
+                res.status(200).json(resume);
+            } catch (error) {
+                console.error('Error fetching resume:', error);
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        });
+
+        // view feedback
+        app.get('/resume/:resumeId', async (req, res) => {
+            const resumeId = req.params.resumeId;
+            try {
+                const resume = await Resume.findById(resumeId);
                 if (!resume) {
                 return res.status(200).json(null); // user doesnt have a resume
                 }
@@ -276,7 +275,6 @@ async function startServer() {
         // fetch feedbacks for the resume
         app.get("/feedbacks/:resumeId", async (req, res) => {
             const resumeId = req.params.resumeId;
-
             try {
                 const resume = await Resume.findById(resumeId);
                 if (!resume) {
@@ -293,21 +291,15 @@ async function startServer() {
         // Route to submit feedback for a resume
         app.post("/feedbacks", async (req, res) => {
             const { resumeId, comment } = req.body;
-
-            if (!req.isAuthenticated()) {
-                return res.status(401).json({ error: "Unauthorized" });
-            }
-            //TODO userid session
-            console.log(req.user._id);
+     
             try {
                 const resume = await Resume.findById(resumeId);
                 if (!resume) {
                     return res.status(404).send('Resume not found');
                 }
-                // TODO SESSION reviewer.username
-                
+
                 resume.feedbacks.push({
-                    reviewer: req.user._id,   //  link with reviwer(current session id's name)
+                    reviewer: userId,   
                     comment,
                     date: new Date(), 
                 });
@@ -322,58 +314,49 @@ async function startServer() {
         
         // Route to save resume
         app.post("/saveResume", async (req, res) => {
-        const { firstName, lastName, email, phone, location, summary, education, experience, skills } = req.body;
-        console.log(req.user);
-        const userId = req.user._id;
-        try {
-            const user = await User.findById(userId);
-            if (!user) {
-                return res.status(404).send('User not found');
+            try {
+                let existingResume = await Resume.findOne({ userId });
+                
+                // update
+                if (existingResume) {
+                existingResume.personalInformation.firstname = req.body.personalInformation.firstname;
+                existingResume.personalInformation.lastname = req.body.personalInformation.lastname;
+                existingResume.personalInformation.email = req.body.personalInformation.email;
+                existingResume.personalInformation.phone = req.body.personalInformation.phone;
+                existingResume.personalInformation.address = req.body.personalInformation.address;
+                existingResume.summary = req.body.summary;
+                existingResume.experience = req.body.experience;
+                existingResume.education = req.body.education;
+                existingResume.skills = req.body.skills;
+
+                await existingResume.save()
+                res.status(200).json(existingResume);  
+                } else {
+                // insert
+                const newResume = new Resume({
+                    userId,
+                    personalInformation: { 
+                    firstname: req.body.personalInformation.firstname,
+                    lastname: req.body.personalInformation.lastname,
+                    email: req.body.personalInformation.email,
+                    phone: req.body.personalInformation.phone,
+                    address: req.body.personalInformation.address, 
+                    },
+                    summary: req.body.summary,
+                    experience: req.body.experience,
+                    education: req.body.education,
+                    skills: req.body.skills
+                });
+
+                await newResume.save();
+
+                res.status(201).json(newResume); 
+                }
+
+            } catch (error) {
+                console.error("Error saving resume:", error);
+                res.status(500).send("Server error");
             }
-            let existingResume = await Resume.findOne({ userId });
-            
-            // update
-            if (existingResume) {
-            console.log("in update");  
-            existingResume.personalInformation.firstname = firstName;
-            existingResume.personalInformation.lastname = lastName;
-            existingResume.personalInformation.email = email;
-            existingResume.personalInformation.phone = phone;
-            existingResume.personalInformation.address = location;
-            existingResume.summary = summary;
-            existingResume.experience = experience;
-            existingResume.education = education;
-            existingResume.skills = skills;
-
-            await existingResume.save()
-            res.status(200).json(existingResume);  
-            } else {
-            console.log("in insert");  
-            // insert
-            const newResume = new Resume({
-                userId,
-                personalInformation: { 
-                firstname: firstName,
-                lastname: lastName,
-                email,
-                phone,
-                address: location, 
-                },
-                summary,
-                experience,
-                education,
-                skills
-            });
-
-            await newResume.save();
-
-            res.status(201).json(newResume); 
-            }
-
-        } catch (error) {
-            console.error("Error saving resume:", error);
-            res.status(500).send("Server error");
-        }
         });
 
         // Start the server after DB connection is established

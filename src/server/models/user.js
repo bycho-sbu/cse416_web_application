@@ -7,6 +7,9 @@ const userSchema = new Schema({
     required: true,
     unique: true,
   },
+  name: {
+    type: String
+  },
   resumes: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -17,3 +20,5 @@ const userSchema = new Schema({
 });
 
 const User = mongoose.model('User', userSchema);
+
+export default User;

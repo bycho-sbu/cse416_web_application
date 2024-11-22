@@ -1,10 +1,11 @@
 import React, { useState,useEffect  } from 'react';
-import InfoForm from './InfoForm';
 import Section from './Section';
-import { getResume } from '../api';
-import { fetchCurrentUserId } from '../api';
-import { useNavigate } from 'react-router-dom';
+import { getResumeByResumeId } from '../api';
 
+
+interface ResumeViewProps {
+  resumeId: string | undefined;
+}
 interface FormData {
   personalInformation: {
     firstname: string;
@@ -36,34 +37,15 @@ interface FormData {
 }
 
 
-const ResumeEditor: React.FC = () => {
-  const [showInfoForm, setShowInfoForm] = useState(false);
+const ResumeView: React.FC<ResumeViewProps> = ({ resumeId }) => {
   const [formData, setFormData] = useState<FormData | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userId = await fetchCurrentUserId(); 
-        setCurrentUserId(userId); 
-        if(userId == ''){
-          alert("You must login to create or edit resume. Please login");
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error('Error fetching current user:', error);
-      }
-    };
-    fetchUser();
-  }, []);
    
   // Fetch resume data on load
   useEffect(() => {
     const fetchResume = async () => {
       try {
-        const data = await getResume(); 
+        const data = await getResumeByResumeId(resumeId); 
         if (data == null || !data) {
           alert('No resume found for this user.\nPlease enter the fields to create new resume.');
           setFormData(null); 
@@ -99,14 +81,14 @@ const ResumeEditor: React.FC = () => {
           })) || [],
         };
 
-        setFormData(transformedData); // Update the state
+        setFormData(transformedData); 
       } catch (error) {
         console.error('Error fetching resume:', error);
       }
     };
 
     fetchResume();
-  }, [currentUserId]);
+  }, [resumeId]);
   
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
@@ -182,29 +164,8 @@ const ResumeEditor: React.FC = () => {
           <p>List your educational background, schools, degrees, and graduation dates...</p>
         )}
       </Section>
-
-      {/* InfoForm Modal */}
-      {showInfoForm && (
-        <InfoForm
-          onClose={() => setShowInfoForm(false)}
-          onSubmit={(data:FormData) => {
-            setFormData(data);
-            setShowInfoForm(false);
-          }}
-          initialData={formData}
-          currentUserId={currentUserId}
-        />
-      )}
-
-      {/* Button to Open InfoForm */}
-      <button
-        onClick={() => setShowInfoForm(true)}
-        style={{ cursor: 'pointer', marginTop: '20px' }}
-      >
-        Input Information
-      </button>
     </div>
   );
 };
 
-export default ResumeEditor;
+export default ResumeView;

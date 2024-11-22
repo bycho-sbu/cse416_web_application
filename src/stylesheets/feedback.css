@@ -1,10 +1,8 @@
 .feedback-page {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: 80vh;
-  padding: 20px;
-  text-align: left;
+  align-items: center; /* centers children horizontally */
+  justify-content: flex-start; /* optional, aligns children vertically */
 }
 
 .feedback-title {
@@ -61,6 +59,7 @@
 }
 
 .feedback-card {
+  text-align: left;
   padding: 15px;
   border: 1px solid #ccc;
   border-radius: 8px;

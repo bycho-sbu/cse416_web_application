@@ -6,16 +6,22 @@ const API_URL = 'http://localhost:2424';
 export const getResumes = async () => {
   try {
     const response = await axios.get(`${API_URL}/resumes`);
-    return response.data;
+    return response.data; 
   } catch (error) {
     console.error('Error fetching resumes:', error);
     return [];
   }
 };
 
-//fetching one by userid
-export const getResume = async (userId: string) => {
-  const response = await axios.get(`${API_URL}/resume/${userId}`);
+//fetching resume by userId
+export const getResume = async () => {
+  const response = await axios.get(`${API_URL}/resume`);
+  return response.data;
+};
+
+// fetching resume by resumeId
+export const getResumeByResumeId = async (resumeId: any) => {
+  const response = await axios.get(`${API_URL}/resume/${resumeId}`);
   return response.data;
 };
 
@@ -49,7 +55,6 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
   };
   
   export const submitResume = async (resumeData: any) => {
-    console.log("resumedata",resumeData);
     try {
       const response = await axios.post(`${API_URL}/saveResume`, resumeData, {
         headers: {
@@ -63,12 +68,23 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
     }
   };
 
-  export const fetchCurrentUser = async () => {
+  export const fetchCurrentUserId = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/usertest`);
-      return response.data;
+      const response = await axios.get(`${API_URL}/fetchCurrentUser`);
+      return response.data.userId;
     } catch (error) {
       console.error('Failed to fetch current user', error);
       throw new Error('Failed to fetch current user');
+    }
+  };
+
+  export const getUserName = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/getUserName`);
+      console.log(response);
+      return response.data.userName;
+    } catch (error) {
+      console.error('Failed to fetch user name', error);
+      throw new Error('Failed to fetch user name');
     }
   };

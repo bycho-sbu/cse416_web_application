@@ -1,18 +1,58 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import '../stylesheets/Feedboard.css'
+import { getResumes } from '../api';
 
-// destructuring resumes
-interface FeedboardProps {
-  resumes: any[];
+interface Resume {
+  _id: string;
+  userId: string;
+  personalInformation: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  experience: Array<{
+    jobTitle: string;
+    company: string;
+    startDate: Date;
+    endDate: Date;
+    description: string;
+  }>;
+  summary: string;
+  education: Array<{
+    degree: string;
+    institution: string;
+    startDate: Date;
+    endDate: Date;
+  }>;
+  skills: string[];
+  feedbacks: Array<{
+    reviewer: string;
+    comment: string;
+    date: Date;
+  }>;
+  createdAt: string;  
+  updatedAt: string;
 }
 
-export default function Feedboard({ resumes }: FeedboardProps) {
+export default function Feedboard() {
 
   const [sortOrder, setSortOrder] = useState('newest')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
+  const [resumes, setResumes] = useState<Resume[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchResumes = async () => {
+      const resumeData = await getResumes();
+      setResumes(resumeData);
+    };
+    
+    fetchResumes();
+  }, []);
 
   // button action 
   const sortedResumes = resumes.sort((a, b) => {
