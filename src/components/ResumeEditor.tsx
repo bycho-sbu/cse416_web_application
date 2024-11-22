@@ -35,22 +35,76 @@ interface FormData {
   }[]; 
 }
 
-
 const ResumeEditor: React.FC = () => {
-  const [showInfoForm, setShowInfoForm] = useState(false);
-  const [formData, setFormData] = useState<FormData | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const navigate = useNavigate();
+const [showInfoForm, setShowInfoForm] = useState(false);
+const [formData, setFormData] = useState<FormData | null>(null);
+const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+const navigate = useNavigate();
 
+useEffect(() => {
+  const fetchUserAndResume = async () => {
+    try {
+      // Fetch current user ID
+      const userId = await fetchCurrentUserId();``
+      setCurrentUserId(userId);
+    
+      // fetch resume data for the logged-in user
+      const data = await getResume();
+      if (data == null || !data) {
+        setFormData(null);
+      }
 
+      const transformedData: FormData = {
+        personalInformation: {
+          firstname: data.personalInformation?.firstname || '',
+          lastname: data.personalInformation?.lastname || '',
+          email: data.personalInformation?.email || '',
+          phone: data.personalInformation?.phone || '',
+          address: data.personalInformation?.address || '',
+        },
+        experience: data.experience?.map((exp: any) => ({
+          jobTitle: exp.jobTitle || '',
+          company: exp.company || '',
+          startDate: exp.startDate || '',
+          endDate: exp.endDate || '',
+          description: exp.description || '',
+        })) || [],
+        summary: data.summary || '',
+        education: data.education?.map((edu: any) => ({
+          degree: edu.degree || '',
+          institution: edu.institution || '',
+          startDate: edu.startDate || '',
+          endDate: edu.endDate || '',
+        })) || [],
+        skills: data.skills || [],
+        feedbacks: data.feedbacks?.map((feedback: any) => ({
+          reviewer: feedback.reviewer || '',
+          comment: feedback.comment || '',
+          date: feedback.date || '',
+        })) || [],
+      };
+
+      setFormData(transformedData); // Update the state with the resume data
+    } catch (error) {
+      console.error('Error fetching user and resume:', error);
+    }
+  };
+
+  fetchUserAndResume(); // Run the combined function
+}, [navigate]);
+/*
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const userId = await fetchCurrentUserId(); 
         setCurrentUserId(userId); 
         if(userId == ''){
-          alert("You must login to create or edit resume. Please login");
-          navigate("/login");
+          if (!alertShownLogin) {
+            setAlertShownLogin(true);
+            alert("You must login to create or edit resume. Please login");
+            navigate("/login");
+          }
+          
         }
       } catch (error) {
         console.error('Error fetching current user:', error);
@@ -65,9 +119,12 @@ const ResumeEditor: React.FC = () => {
       try {
         const data = await getResume(); 
         if (data == null || !data) {
-          alert('No resume found for this user.\nPlease enter the fields to create new resume.');
-          setFormData(null); 
-          return;
+          if (!alertShownResume) {
+            setAlertShownResume(true);
+            alert('No resume found for this user.\nPlease enter the fields to create new resume.');
+            setFormData(null); 
+            return;
+          }
         }   
         const transformedData: FormData = {
           personalInformation: {
@@ -107,7 +164,7 @@ const ResumeEditor: React.FC = () => {
 
     fetchResume();
   }, [currentUserId]);
-  
+  */
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       {/* Display the user's name if available */}
@@ -198,7 +255,14 @@ const ResumeEditor: React.FC = () => {
 
       {/* Button to Open InfoForm */}
       <button
-        onClick={() => setShowInfoForm(true)}
+        onClick={() => {
+          if (!currentUserId) {
+            alert("You must login to create or edit resume. Please login");
+            navigate("/login");
+          } else {
+            setShowInfoForm(true);
+          }
+        }}
         style={{ cursor: 'pointer', marginTop: '20px' }}
       >
         Input Information

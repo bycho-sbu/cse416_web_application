@@ -78,13 +78,3 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
     }
   };
 
-  export const getUserName = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/getUserName`);
-      console.log(response);
-      return response.data.userName;
-    } catch (error) {
-      console.error('Failed to fetch user name', error);
-      throw new Error('Failed to fetch user name');
-    }
-  };

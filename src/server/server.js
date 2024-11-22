@@ -168,6 +168,7 @@ async function startServer() {
                     console.error('Logout Error:', err);
                     return next(err);
                 }
+                userId = ''
                 res.json({ message: 'Logged out successfully' });
             });
         });
@@ -225,7 +226,6 @@ async function startServer() {
         app.get('/getUserName', async (req,res) => {
             try {
                 const user = await User.findById(userId); 
-                console.log("in server",user);
                 res.status(200).json({userName : user.name});
                 
             } catch (err) {
@@ -276,7 +276,8 @@ async function startServer() {
         app.get("/feedbacks/:resumeId", async (req, res) => {
             const resumeId = req.params.resumeId;
             try {
-                const resume = await Resume.findById(resumeId);
+                const resume = await Resume.findById(resumeId)
+                .populate('feedbacks.reviewer', 'name');
                 if (!resume) {
                     return res.status(404).send('Resume not found');
                 }

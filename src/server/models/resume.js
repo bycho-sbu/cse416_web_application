@@ -38,7 +38,7 @@ const resumeSchema = new Schema({
   skills: [String], 
 
   feedbacks: [{
-    reviewer: { type: String},
+    reviewer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     comment: { type: String},
     date: { type: Date, default: Date.now}
   }],
