@@ -92,79 +92,7 @@ useEffect(() => {
 
   fetchUserAndResume(); // Run the combined function
 }, [navigate]);
-/*
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userId = await fetchCurrentUserId(); 
-        setCurrentUserId(userId); 
-        if(userId == ''){
-          if (!alertShownLogin) {
-            setAlertShownLogin(true);
-            alert("You must login to create or edit resume. Please login");
-            navigate("/login");
-          }
-          
-        }
-      } catch (error) {
-        console.error('Error fetching current user:', error);
-      }
-    };
-    fetchUser();
-  }, []);
-   
-  // Fetch resume data on load
-  useEffect(() => {
-    const fetchResume = async () => {
-      try {
-        const data = await getResume(); 
-        if (data == null || !data) {
-          if (!alertShownResume) {
-            setAlertShownResume(true);
-            alert('No resume found for this user.\nPlease enter the fields to create new resume.');
-            setFormData(null); 
-            return;
-          }
-        }   
-        const transformedData: FormData = {
-          personalInformation: {
-            firstname: data.personalInformation?.firstname || '',
-            lastname: data.personalInformation?.lastname || '',
-            email: data.personalInformation?.email || '',
-            phone: data.personalInformation?.phone || '',
-            address: data.personalInformation?.address || '',
-          },
-          experience: data.experience?.map((exp: any) => ({
-            jobTitle: exp.jobTitle || '',
-            company: exp.company || '',
-            startDate: exp.startDate || '',
-            endDate: exp.endDate || '',
-            description: exp.description || '',
-          })) || [],
-          summary: data.summary || '',
-          education: data.education?.map((edu: any) => ({
-            degree: edu.degree || '',
-            institution: edu.institution || '',
-            startDate: edu.startDate || '',
-            endDate: edu.endDate || '',
-          })) || [],
-          skills: data.skills || [],
-          feedbacks: data.feedbacks?.map((feedback: any) => ({
-            reviewer: feedback.reviewer || '',
-            comment: feedback.comment || '',
-            date: feedback.date || '',
-          })) || [],
-        };
 
-        setFormData(transformedData); // Update the state
-      } catch (error) {
-        console.error('Error fetching resume:', error);
-      }
-    };
-
-    fetchResume();
-  }, [currentUserId]);
-  */
   const generate = async (data: FormData | null) => {
     if (!data) {
       console.error("No data to generate summary from.");
