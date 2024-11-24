@@ -1,5 +1,11 @@
 import axios from 'axios';
+import { FormData } from './components/ResumeEditor';
 
+<<<<<<< HEAD
+=======
+// @@@@@@@@@@@@@@@@@ line 56 uncomment @@@@@@@@@@@@@@@@@@@
+
+>>>>>>> 1c56c0a8f0d69de792df611f5b56bed964ae3b9b
 const API_URL = 'http://localhost:2424'; 
 
 //fetching all resumes
@@ -53,15 +59,28 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
       throw error;  
     }
   };
+
+  export const generateSummary = async (resumeInfo: FormData | any): Promise<string> => {
+    try {
+      console.log("RESUME:", resumeInfo);
+      const response = await axios.post(`${API_URL}/generateSummary`, resumeInfo);
+      console.log("Response:", response.data);
+      return response.data; // Return the data from the API response
+    } catch (error) {
+      console.error("Error:", error);
+      return ""; // Return an empty string or handle the error as needed
+    }
+  };
   
   export const submitResume = async (resumeData: any) => {
     try {
-      const response = await axios.post(`${API_URL}/saveResume`, resumeData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      return response.data; 
+        //@@@@@@@@@@@@@@@@@@@@@@@@@ To be uncommented @@@@@@@@@@@@@@@@@@@@@@@@@
+    //   const response = await axios.post(`${API_URL}/saveResume`, resumeData, {
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   });
+    //   return response.data; 
     } catch (error) {
       console.error('Error submitting resume:', error);
       throw new Error('Failed to submit resume');

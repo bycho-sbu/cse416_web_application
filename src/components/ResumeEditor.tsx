@@ -1,7 +1,7 @@
 import React, { useState,useEffect  } from 'react';
 import InfoForm from './InfoForm';
 import Section from './Section';
-import { getResume } from '../api';
+import { getResume, generateSummary } from '../api';
 import { fetchCurrentUserId } from '../api';
 import { useNavigate } from 'react-router-dom';
 
@@ -165,6 +165,26 @@ useEffect(() => {
     fetchResume();
   }, [currentUserId]);
   */
+  const generate = async (data: FormData | null) => {
+    if (!data) {
+      console.error("No data to generate summary from.");
+      return;
+    }
+  
+    try {
+      const res = await generateSummary(data); // Assuming this is an API call to generate the summary
+      setFormData((prev) => {
+        if (!prev) return null; // Handle case where formData is null
+        return {
+          ...prev,
+          summary: res, // Update only the summary field
+        };
+      });
+    } catch (error) {
+      console.error("Error generating summary:", error);
+    }
+  };
+  
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       {/* Display the user's name if available */}
@@ -266,6 +286,13 @@ useEffect(() => {
         style={{ cursor: 'pointer', marginTop: '20px' }}
       >
         Input Information
+      </button>
+
+      <button
+        onClick={() => generate(formData)}
+        style={{cursor: 'pointer', marginTop: '20px'}}
+        >
+        Generate Summary with AI
       </button>
     </div>
   );

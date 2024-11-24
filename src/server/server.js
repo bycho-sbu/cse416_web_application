@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors'; // Import the cors package
 import bcrypt from 'bcrypt';
+import Groq from 'groq-sdk';
 
 import Resume from './models/resume.js';
 import User from './models/user.js';
@@ -39,6 +40,9 @@ if (!MONGODB_URI || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET || !SESSION_SECRE
 // MongoDB connection setup
 mongoose.connect(MONGODB_URI);
 let db = mongoose.connection;
+
+// AI setup
+const groq = new Groq({ apiKey: process.env.GROQ_APIKEY });
 
 // Start the server after connecting to the database
 async function startServer() {
@@ -83,15 +87,16 @@ async function startServer() {
                     let user = await db.collection('users').findOne({ email });
 
                     if (!user) {
-                    const newUser = {
-                        email,
-                        name: profile.displayName,
-                        googleId: profile.id,
-                        createdAt: new Date(),
-                    };
-                    const result = await db.collection('users').insertOne(newUser);
-                    newUser._id = result.insertedId;
-                    user = newUser;
+                        const newUser = {
+                            email,
+                            name: profile.displayName,
+                            googleId: profile.id,
+                            createdAt: new Date(),
+                        };
+                        
+                        const result = await db.collection('users').insertOne(newUser);
+                        newUser._id = result.insertedId;
+                        user = newUser;
                     }
 
                     return done(null, user);
@@ -290,6 +295,33 @@ async function startServer() {
 
         // ---------------POST-------------------------
         // Route to submit feedback for a resume
+        app.post("/generateSummary", async (req, res) => {
+            
+            try {
+                // Default
+                var content = "With following information, please provide professional and descriptive summary for resume: " + JSON.stringify(req.body);
+                console.log(content);
+                const completion = await groq.chat.completions
+                    .create({
+                    messages: [
+                        {
+                            role: "system",
+                            content: content,
+                        },
+                    ],
+                        model: "llama3-8b-8192",
+                    })
+                    .then((chatCompletion) => {
+                        // console.log(chatCompletion.choices[0]?.message?.content || "No results");
+                        res.send(chatCompletion.choices[0]?.message?.content || "No results");
+                    });
+                // console.log(completion);
+            } catch(err) {
+                console.error(err);
+                res.status(500).send("Server error");
+            }
+        })
+        
         app.post("/feedbacks", async (req, res) => {
             const { resumeId, comment } = req.body;
      
