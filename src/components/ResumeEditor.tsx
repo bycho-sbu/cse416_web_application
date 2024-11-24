@@ -45,7 +45,7 @@ useEffect(() => {
   const fetchUserAndResume = async () => {
     try {
       // Fetch current user ID
-      const userId = await fetchCurrentUserId();``
+      const userId = await fetchCurrentUserId();
       setCurrentUserId(userId);
     
       // fetch resume data for the logged-in user
