@@ -5,7 +5,7 @@ import { getResume, generateSummary } from '../api';
 import { fetchCurrentUserId } from '../api';
 import { useNavigate } from 'react-router-dom';
 
-interface FormData {
+export interface FormData {
   personalInformation: {
     firstname: string;
     lastname: string;
