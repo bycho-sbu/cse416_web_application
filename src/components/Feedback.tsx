@@ -17,31 +17,26 @@ export default function FeedbackPage() {
   const { resumeId } = useParams();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
-        const userId = await fetchCurrentUserId(); 
-        setCurrentUserId(userId || ''); 
-      } catch (error) {
-        console.error('Error fetching current user:', error);
-      }
-    };
-    fetchUser();
-  }, []);
+        // Fetch the current user ID
+        const userId = await fetchCurrentUserId();
+        setCurrentUserId(userId || '');
 
-  // fetching feedback with the resumeid
-  useEffect(() => {
-    const fetchFeedback = async () => {
-      if (resumeId) {
-        const feedbackData = await getFeedback(resumeId);
-        setFeedbackList(feedbackData);
+        // Fetch feedback only if resumeId is available
+        if (resumeId) {
+          const feedbackData = await getFeedback(resumeId);
+          setFeedbackList(feedbackData);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
     };
-    if (resumeId) {
-      fetchFeedback();
-    }
-  }, [resumeId]); 
+
+    fetchData();
+  }, [resumeId]);
 
   // submitting feedback to the resume
   const handleSubmitFeedback = async () => {

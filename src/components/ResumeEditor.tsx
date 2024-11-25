@@ -1,22 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState,useEffect  } from 'react';
 import InfoForm from './InfoForm';
 import Section from './Section';
 import { getResume, generateSummary } from '../api';
 import { fetchCurrentUserId } from '../api';
 import { useNavigate } from 'react-router-dom';
 
-// Import the libraries
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-
-export interface FormData {
+interface FormData {
   personalInformation: {
     firstname: string;
     lastname: string;
     email: string;
     phone: string;
     address: string;
-    imageUrl?: string;
   };
   experience: {
     jobTitle: string;
@@ -24,7 +19,6 @@ export interface FormData {
     startDate: string;
     endDate: string;
     description: string;
-    imageUrl?: string;
   }[];
   summary: string;
   education: {
@@ -32,139 +26,93 @@ export interface FormData {
     institution: string;
     startDate: string;
     endDate: string;
-    imageUrl?: string;
   }[];
   skills: string[];
   feedbacks: {
     reviewer: string;
     comment: string;
     date: string;
-  }[];
+  }[]; 
 }
 
 const ResumeEditor: React.FC = () => {
-  const [showInfoForm, setShowInfoForm] = useState(false);
-  const [formData, setFormData] = useState<FormData | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const navigate = useNavigate();
+const [showInfoForm, setShowInfoForm] = useState(false);
+const [formData, setFormData] = useState<FormData | null>(null);
+const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+const navigate = useNavigate();
 
-  // Ref for the resume content
-  const resumeContentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchUserAndResume = async () => {
-      try {
-        const userId = await fetchCurrentUserId();
-        setCurrentUserId(userId);
-
-        const data = await getResume();
-        if (data == null || !data) {
-          setFormData(null);
-          return; // Early return if no data
-        }
-
-        const transformedData: FormData = {
-          personalInformation: {
-            firstname: data.personalInformation?.firstname || '',
-            lastname: data.personalInformation?.lastname || '',
-            email: data.personalInformation?.email || '',
-            phone: data.personalInformation?.phone || '',
-            address: data.personalInformation?.address || '',
-            imageUrl: data.personalInformation?.imageUrl || '',
-          },
-          experience:
-            data.experience?.map((exp: any) => ({
-              jobTitle: exp.jobTitle || '',
-              company: exp.company || '',
-              startDate: exp.startDate || '',
-              endDate: exp.endDate || '',
-              description: exp.description || '',
-              imageUrl: exp.imageUrl || '',
-            })) || [],
-          summary: data.summary || '',
-          education:
-            data.education?.map((edu: any) => ({
-              degree: edu.degree || '',
-              institution: edu.institution || '',
-              startDate: edu.startDate || '',
-              endDate: edu.endDate || '',
-              imageUrl: edu.imageUrl || '',
-            })) || [],
-          skills: data.skills || [],
-          feedbacks:
-            data.feedbacks?.map((feedback: any) => ({
-              reviewer: feedback.reviewer || '',
-              comment: feedback.comment || '',
-              date: feedback.date || '',
-            })) || [],
-        };
-
-        setFormData(transformedData);
-      } catch (error) {
-        console.error('Error fetching user and resume:', error);
+useEffect(() => {
+  const fetchUserAndResume = async () => {
+    try {
+      // Fetch current user ID
+      const userId = await fetchCurrentUserId();
+      setCurrentUserId(userId);
+    
+      // fetch resume data for the logged-in user
+      const data = await getResume();
+      if (data == null || !data) {
+        setFormData(null);
       }
-    };
 
-    fetchUserAndResume();
-  }, [navigate]);
+      const transformedData: FormData = {
+        personalInformation: {
+          firstname: data.personalInformation?.firstname || '',
+          lastname: data.personalInformation?.lastname || '',
+          email: data.personalInformation?.email || '',
+          phone: data.personalInformation?.phone || '',
+          address: data.personalInformation?.address || '',
+        },
+        experience: data.experience?.map((exp: any) => ({
+          jobTitle: exp.jobTitle || '',
+          company: exp.company || '',
+          startDate: exp.startDate || '',
+          endDate: exp.endDate || '',
+          description: exp.description || '',
+        })) || [],
+        summary: data.summary || '',
+        education: data.education?.map((edu: any) => ({
+          degree: edu.degree || '',
+          institution: edu.institution || '',
+          startDate: edu.startDate || '',
+          endDate: edu.endDate || '',
+        })) || [],
+        skills: data.skills || [],
+        feedbacks: data.feedbacks?.map((feedback: any) => ({
+          reviewer: feedback.reviewer || '',
+          comment: feedback.comment || '',
+          date: feedback.date || '',
+        })) || [],
+      };
+
+      setFormData(transformedData); // Update the state with the resume data
+    } catch (error) {
+      console.error('Error fetching user and resume:', error);
+    }
+  };
+
+  fetchUserAndResume(); // Run the combined function
+}, [navigate]);
 
   const generate = async (data: FormData | null) => {
     if (!data) {
-      console.error('No data to generate summary from.');
+      console.error("No data to generate summary from.");
       return;
     }
-
+  
     try {
-      const res = await generateSummary(data);
+      const res = await generateSummary(data); // Assuming this is an API call to generate the summary
       setFormData((prev) => {
-        if (!prev) return null;
+        if (!prev) return null; // Handle case where formData is null
         return {
           ...prev,
-          summary: res,
+          summary: res, // Update only the summary field
         };
       });
     } catch (error) {
-      console.error('Error generating summary:', error);
+      console.error("Error generating summary:", error);
     }
   };
-
-  // Function to download PDF with margins
-  const downloadPDF = () => {
-    if (!resumeContentRef.current) return;
-
-    html2canvas(resumeContentRef.current, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'pt', 'a4');
-
-      // Define margins
-      const marginLeft = 40; // Left margin in points
-      const marginTop = 40; // Top margin in points
-      const marginRight = 40; // Right margin in points
-      const marginBottom = 40; // Bottom margin in points
-
-      // Calculate available width and height
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth - marginLeft - marginRight;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = marginTop;
-
-      pdf.addImage(imgData, 'PNG', marginLeft, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight - marginTop - marginBottom;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight + marginTop;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', marginLeft, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight - marginTop - marginBottom;
-      }
-
-      pdf.save('resume.pdf');
-    });
-  };
-
+  
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       {/* Resume Content */}
@@ -175,29 +123,25 @@ const ResumeEditor: React.FC = () => {
             : 'Your Name’s Resume'}
         </h1>
 
-        {/* Personal Image */}
-        {formData?.personalInformation.imageUrl && (
-          <img
-            src={formData.personalInformation.imageUrl}
-            alt="Profile"
-            style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '50%' }}
-          />
+      {/* Personal Section */}
+      <Section title="Contact Information">
+        {formData ? (
+          <p>
+            {formData.personalInformation.phone} | {formData.personalInformation.email} | {formData.personalInformation.address}
+          </p>
+        ) : (
+          <p>Phone Number | Email | Location</p>
         )}
+      </Section>
 
-        <Section title="Contact Information">
-          {formData ? (
-            <p>
-              {formData.personalInformation.phone} | {formData.personalInformation.email} |{' '}
-              {formData.personalInformation.address}
-            </p>
-          ) : (
-            <p>Phone Number | Email | Location</p>
-          )}
-        </Section>
-
-        <Section title="Professional Summary">
-          {formData ? <p>{formData.summary}</p> : <p>Briefly describe your professional background...</p>}
-        </Section>
+      {/* Professional Summary Section */}
+      <Section title="Professional Summary">
+        {formData ? (
+          <p>{formData.summary}</p>
+        ) : (
+          <p>Briefly describe your professional background, skills, and goals...</p>
+        )}
+      </Section>
 
         <Section title="Experience">
           {formData ? (
@@ -224,17 +168,18 @@ const ResumeEditor: React.FC = () => {
           )}
         </Section>
 
-        <Section title="Skills">
-          {formData ? (
-            <ul>
-              {formData.skills.map((skill, index) => (
-                <li key={index}>{skill}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>List 3-4 special, work-related skills...</p>
-          )}
-        </Section>
+      {/* Skills Section */}
+      <Section title="Skills">
+        {formData ? (
+          <ul>
+            {formData.skills.map((skill, index) => (
+              <li key={index}>{skill}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>List 3-4 special, work-related skills...</p>
+        )}
+      </Section>
 
         <Section title="Education">
           {formData ? (
@@ -274,31 +219,27 @@ const ResumeEditor: React.FC = () => {
             />
           )}
 
-      {/* Buttons */}
-      <div style={{ marginTop: '20px' }}>
-        <button
-          onClick={() => {
-            if (!currentUserId) {
-              alert('You must login to create or edit resume. Please login');
-              navigate('/login');
-            } else {
-              setShowInfoForm(true);
-            }
-          }}
-          style={{ cursor: 'pointer', marginRight: '10px' }}
+      {/* Button to Open InfoForm */}
+      <button
+        onClick={() => {
+          if (!currentUserId) {
+            alert("You must login to create or edit resume. Please login");
+            navigate("/login");
+          } else {
+            setShowInfoForm(true);
+          }
+        }}
+        style={{ cursor: 'pointer', marginTop: '20px' }}
+      >
+        Input Information
+      </button>
+
+      <button
+        onClick={() => generate(formData)}
+        style={{cursor: 'pointer', marginTop: '20px'}}
         >
-          Input Information
-        </button>
-
-        <button onClick={() => generate(formData)} style={{ cursor: 'pointer', marginRight: '10px' }}>
-          Generate Summary with AI
-        </button>
-
-        <button onClick={downloadPDF} style={{ cursor: 'pointer' }}>
-          Download PDF
-        </button>
-      </div>
-
+        Generate Summary with AI
+      </button>
     </div>
   );
 };

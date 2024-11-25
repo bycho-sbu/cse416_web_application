@@ -126,7 +126,7 @@ const ResumeView: React.FC<ResumeViewProps> = ({ resumeId }) => {
             <div key={index} style={{ marginBottom: '15px' }}>
               <h3>{exp.jobTitle} at {exp.company}</h3>
               <p>
-                {exp.startDate} - {exp.endDate}
+              {new Date(exp.startDate).toLocaleDateString()}~{new Date(exp.endDate).toLocaleDateString()}
               </p>
               <p>{exp.description}</p>
             </div>
@@ -156,7 +156,7 @@ const ResumeView: React.FC<ResumeViewProps> = ({ resumeId }) => {
             <div key={index} style={{ marginBottom: '15px' }}>
               <h3>{edu.degree} at {edu.institution}</h3>
               <p>
-                {edu.startDate} - {edu.endDate}
+              {new Date(edu.startDate).toLocaleDateString()}~{new Date(edu.endDate).toLocaleDateString()}
               </p>
             </div>
           ))
