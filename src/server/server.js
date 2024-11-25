@@ -299,7 +299,7 @@ async function startServer() {
             
             try {
                 // Default
-                var content = "With following information, please provide professional and descriptive summary for resume: " + JSON.stringify(req.body);
+                var content = "With following information, please provide professional and descriptive summary for resume. When writing, please refer me as a first person: " + JSON.stringify(req.body);
                 console.log(content);
                 const completion = await groq.chat.completions
                     .create({
