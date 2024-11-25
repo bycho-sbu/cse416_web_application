@@ -47,8 +47,6 @@ const groq = new Groq({ apiKey: process.env.GROQ_APIKEY });
 // Start the server after connecting to the database
 async function startServer() {
     try {
-        // db = client.db('CSE416-Project'); // Replace with your database name
-        // console.log('Connected to MongoDB');
 
         db.on("error", console.error.bind(console, "MongoDB connection error:"));
         db.on("connected", () => {
@@ -63,7 +61,7 @@ async function startServer() {
                 saveUninitialized: true,
                 cookie: {
                     secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'lax', // Adjust as needed
+                    sameSite: 'lax', 
                     maxAge: 24 * 60 * 60 * 1000,
                 },
             })
@@ -98,6 +96,7 @@ async function startServer() {
                         newUser._id = result.insertedId;
                         user = newUser;
                     }
+                    userId = user._id;
 
                     return done(null, user);
                     } catch (err) {
@@ -300,7 +299,7 @@ async function startServer() {
             try {
                 // Default
                 var content = "With following information, please provide professional and descriptive summary for resume: " + JSON.stringify(req.body);
-                console.log(content);
+                //console.log(content);
                 const completion = await groq.chat.completions
                     .create({
                     messages: [

@@ -1,7 +1,11 @@
 import React from 'react';
 import '../stylesheets/homepage.css';
+import { useNavigate } from 'react-router-dom';
+
+
 
 function Homepage() {
+  const navigate = useNavigate();
   return (
     <div className="homepage">
       <section className="hero">
@@ -16,8 +20,8 @@ function Homepage() {
           Your journey to building professional resumes starts here. <br/>Create or upload your resume and get closer to your dream job today!
         </p>
         <div className="cta-buttons">
-          <button className="cta create-button">Create New Resume</button>
-          <button className="cta upload-button">Upload Existing Resume</button>
+          <button className="cta create-button" onClick={() => navigate('/resume-editor')}>Create New Resume</button>
+          <button className="cta upload-button" onClick={() => navigate('/resume-editor')}>Edit Existing Resume</button>
         </div>
       </section>{/*hero end*/}
       <section className="features">
@@ -45,7 +49,6 @@ function Homepage() {
             by other users. 
             </p>
           </li>
-          <button className="cta feature-button">Get Started</button>
         </ul>
       </section> {/*feature end*/}
     </div>

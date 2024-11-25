@@ -65,7 +65,6 @@ const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData, cur
   const [experience, setExperience] = useState<ExperienceEntry[]>(initialData?.experience || []);
   const [skills, setSkills] = useState<string[]>(initialData?.skills || []);
 
-  console.log("currentUserId",currentUserId);
   // Methods to add entries
   const handleAddEducation = () => {
     setEducation([
