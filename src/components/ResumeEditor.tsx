@@ -226,7 +226,7 @@ const ResumeEditor: React.FC = () => {
 
         <Section title="Skills">
           {formData ? (
-            <ul>
+            <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
               {formData.skills.map((skill, index) => (
                 <li key={index}>{skill}</li>
               ))}

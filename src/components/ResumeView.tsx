@@ -139,7 +139,7 @@ const ResumeView: React.FC<ResumeViewProps> = ({ resumeId }) => {
       {/* Skills Section */}
       <Section title="Skills">
         {formData ? (
-          <ul>
+          <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
             {formData.skills.map((skill, index) => (
               <li key={index}>{skill}</li>
             ))}
