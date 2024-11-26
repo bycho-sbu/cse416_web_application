@@ -93,3 +93,12 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
     }
   };
 
+  export const getUsername = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/getUsername`);
+      return response.data.username;
+    } catch (error) {
+      console.error('Failed to fetch current username', error);
+      throw new Error('Failed to fetch current username');
+    }
+  };

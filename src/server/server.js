@@ -156,7 +156,11 @@ async function startServer() {
                     if (err) {
                     return res.status(500).json({ error: 'Login failed' });
                     }
-                    res.json({ message: 'Logged in successfully', user });
+                    res.json({
+                        message: 'Logged in successfully',
+                        redirectUrl: 'http://localhost:5173',
+                        user,
+                    });
                     userId = user._id;
                 });
             } catch (err) {
@@ -227,13 +231,13 @@ async function startServer() {
             res.json({ userId: userId });
         });
 
-        app.get('/getUserName', async (req,res) => {
+        app.get('/getUsername', async (req,res) => {
             try {
-                const user = await User.findById(userId); 
-                res.status(200).json({userName : user.name});
+                const user = await User.findOne(userId); 
+                res.status(200).json({username : user.name});
                 
             } catch (err) {
-                console.error("Error fetching user information:", err);
+                console.error("Error fetching user name:", err);
                 res.status(500).send("Server error");
             }
         });

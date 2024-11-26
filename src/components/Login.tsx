@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
     name: string;
@@ -9,9 +10,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [isSignUp, setIsSignUp] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   // Check if user is authenticated
   useEffect(() => {
@@ -72,6 +73,7 @@ export default function LoginPage() {
       if (response.ok) {
         setUser(data.user); // Set the user state upon successful login
         alert(data.message);
+        window.location.href = data.redirectUrl;
       } else {
         alert('Error: ' + data.error);
       }
@@ -112,7 +114,7 @@ export default function LoginPage() {
     window.location.href = 'http://localhost:2424/auth/google';
   };
 
-  // User is logged in.
+  // User is logged in. homepage 
   if (user) {
     return (
       <div className="container">
