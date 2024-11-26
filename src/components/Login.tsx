@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
 
 interface User {
     name: string;
@@ -12,7 +11,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
 
   // Check if user is authenticated
   useEffect(() => {

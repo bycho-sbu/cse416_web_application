@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header'; 
 import Homepage from './components/Homepage';
@@ -26,7 +25,6 @@ function App() {
         <Route path="/feedback/:resumeId" element={<Feedback />} />
         <Route path="/resume-editor" element={<ResumeEditor />} />
       </Routes>
-      <Footer />
     </Router>
   );
 }
