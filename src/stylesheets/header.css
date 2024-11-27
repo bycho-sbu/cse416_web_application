@@ -49,29 +49,42 @@
   position: relative;
   display: inline-block;
 }
-
-.logout-option {
+/* Adjusted styles for hover options container */
+.hover-options {
   display: none;
   position: absolute;
-  top: 100%; /* Position below the login button */
+  top: 100%; /* Below the login button */
   right: 0;
   background-color: white;
   color: black;
-  padding: 10px 15px; /* Same as the login button */
-  border: none;
-  border-radius: 25px; /* Same as the login button */
-  font-size: 1rem; /* Same as the login button */
-  text-align: center;
-  cursor: pointer;
+  border-radius: 10px; /* Rounded corners for the entire menu */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Adds shadow for clarity */
+  overflow: hidden; /* Ensures rounded corners look clean */
   z-index: 10;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Optional: adds a subtle shadow for better visibility */
 }
 
-.logout-option:hover {
+/* Individual option styles */
+.hover-options div {
+  padding: 10px 15px;
+  font-size: 1rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+.hover-options div:hover {
   background-color: #f0f0f0; /* Light hover effect */
 }
 
-/* Show the logout option on hover */
-.login-container:hover .logout-option {
+/* Show hover options on parent hover */
+.login-container:hover .hover-options {
   display: block;
+}
+
+/* Adjust individual option styles to be distinct */
+.feedback-option {
+  border-bottom: 1px solid #e0e0e0; /* Adds a divider between options */
+}
+
+.logout-option {
+  border-top: 1px solid #e0e0e0; /* Adds a divider between options */
 }

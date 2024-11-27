@@ -2,12 +2,13 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../stylesheets/header.css';
-import { getUsername } from '../api';
+import { getUsername,getResumeId } from '../api';
 import { useNavigate } from 'react-router-dom';
 
 
 function Header() {
   const [currentUserName, setCurrentUserName] = useState<string>();
+  const [resumeId, setResumeId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleLogout = async () => { 
@@ -26,22 +27,25 @@ function Header() {
         alert('Error: ' + data.error);
       }
     } catch (error) {
-      console.error('Error logging out:', error);
       alert('Error logging out. Please try again.');
     }
   };
   useEffect(() => {
-    const fetchUsername= async () => {
+    const fetchUserDetail= async () => {
       try {
         const username = await getUsername();
         setCurrentUserName(username || 'Login');
-        console.log("username: ",username);
+        if (username) {
+          const userResumeId = await getResumeId();
+          setResumeId(userResumeId);
+        }
       } catch (error) {
-        console.error("Error fetching username:", error);
-        setCurrentUserName('Login');
+        if(currentUserName == 'Login'){
+          setCurrentUserName('Login');
+        }
       }
     };
-    fetchUsername();
+    fetchUserDetail();
   }, []);
   return (
     <header className="header">
@@ -71,8 +75,23 @@ function Header() {
               {currentUserName}
             </button>
             {currentUserName !== 'Login' && (
-              <div className="logout-option" onClick={handleLogout}>
-                Logout
+              <div className="hover-options">
+                <div 
+                  className="feedback-option" 
+                  onClick={() => {
+                    if (resumeId) {
+                      navigate(`/feedback/${resumeId}`); // Pass resumeId dynamically
+                    } else {
+                      alert('Resume is not found. Please create a new Resume');
+                      navigate('/resume-editor');
+                    }
+                  }}
+                >
+                  View Feedback
+                </div>
+                <div className="logout-option" onClick={handleLogout}>
+                  Logout
+                </div>
               </div>
             )}
           </div>

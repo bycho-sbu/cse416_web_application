@@ -40,6 +40,7 @@ const resumeSchema = new Schema({
   feedbacks: [{
     reviewer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     comment: { type: String},
+    username: {type: String},
     date: { type: Date, default: Date.now}
   }],
   createdAt: {

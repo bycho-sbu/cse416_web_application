@@ -237,17 +237,26 @@ async function startServer() {
                 res.status(200).json({username : user.name});
                 
             } catch (err) {
-                console.error("Error fetching user name:", err);
                 res.status(500).send("Server error");
             }
-        });
+        }); 
+        app.get('/getResumeId', async (req,res) => {
+            try {
+                const resume = await Resume.findOne({userId: userId}); 
+                if (!resume) {
+                    return res.status(404).json({ error: "Resume not found" });
+                }
+                res.status(200).json({resumeId : resume._id});
+            } catch (err) {
+                res.status(500).send("Server error");
+            }
+        })
         // feedboard: fetch all resumes
         app.get("/resumes", async (req, res) => {
             try {
                 const resumes = await Resume.find(); 
                 res.status(200).json(resumes);
             } catch (err) {
-                console.error("Error fetching resumes:", err);
                 res.status(500).send("Server error");
             }
         });
@@ -261,7 +270,6 @@ async function startServer() {
                 }
                 res.status(200).json(resume);
             } catch (error) {
-                console.error('Error fetching resume:', error);
                 res.status(500).json({ error: 'Internal server error' });
             }
         });
@@ -276,7 +284,6 @@ async function startServer() {
                 }
                 res.status(200).json(resume);
             } catch (error) {
-                console.error('Error fetching resume:', error);
                 res.status(500).json({ error: 'Internal server error' });
             }
         });
@@ -284,8 +291,7 @@ async function startServer() {
         app.get("/feedbacks/:resumeId", async (req, res) => {
             const resumeId = req.params.resumeId;
             try {
-                const resume = await Resume.findById(resumeId)
-                .populate('feedbacks.reviewer', 'name');
+                const resume = await Resume.findById(resumeId);
                 if (!resume) {
                     return res.status(404).send('Resume not found');
                 }
@@ -350,9 +356,9 @@ async function startServer() {
             }
         })
         
+        // sending feedback
         app.post("/feedbacks", async (req, res) => {
-            const { resumeId, comment, userName } = req.body;
-            console.log("USERNAME:", userName)
+            const { resumeId, username, comment  } = req.body;
 
             try {
                 const resume = await Resume.findById(resumeId);
@@ -362,7 +368,8 @@ async function startServer() {
 
                 resume.feedbacks.push({
                     reviewer: userId,
-                    comment,
+                    comment: comment,
+                    username: username,
                     date: new Date(), 
                 });
             

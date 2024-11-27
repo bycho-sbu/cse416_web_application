@@ -125,9 +125,11 @@ const ResumeView: React.FC<ResumeViewProps> = ({ resumeId }) => {
           formData.experience.map((exp, index) => (
             <div key={index} style={{ marginBottom: '15px' }}>
               <h3>{exp.jobTitle} at {exp.company}</h3>
-              <p>
-              {new Date(exp.startDate).toLocaleDateString()}~{new Date(exp.endDate).toLocaleDateString()}
-              </p>
+                <p>
+                  {exp.startDate ? new Date(exp.startDate).toLocaleDateString() : ''} 
+                  {exp.startDate && exp.endDate ? ' ~ ' : ''} 
+                  {exp.endDate ? new Date(exp.endDate).toLocaleDateString() : ''}
+                </p>
               <p>{exp.description}</p>
             </div>
           ))
@@ -156,8 +158,10 @@ const ResumeView: React.FC<ResumeViewProps> = ({ resumeId }) => {
             <div key={index} style={{ marginBottom: '15px' }}>
               <h3>{edu.degree} at {edu.institution}</h3>
               <p>
-              {new Date(edu.startDate).toLocaleDateString()}~{new Date(edu.endDate).toLocaleDateString()}
-              </p>
+                    {edu.startDate ? new Date(edu.startDate).toLocaleDateString() : ''} 
+                    {edu.startDate && edu.endDate ? ' ~ ' : ''} 
+                    {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : ''}
+                  </p>
             </div>
           ))
         ) : (

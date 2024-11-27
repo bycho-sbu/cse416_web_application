@@ -110,6 +110,7 @@ const ResumeEditor: React.FC = () => {
   const generate = async (data: FormData | null) => {
     if (!data) {
       console.error('No data to generate summary from.');
+      alert("Please complete the resume first.");
       return;
     }
 
@@ -130,13 +131,13 @@ const ResumeEditor: React.FC = () => {
   const generateFeedback = async (data: FormData | null) => {
     if (!data) {
         console.error("No data to generate feedback from.");
+        alert("Please complete the resume first.");
         return;
     }
 
     try {
         const res = await generateAIFeedback(data);
         var resume = await getResume();
-        console.log(getUsername())
         submitFeedback(resume._id, "AI", res);
         navigate(`/feedback/${resume._id}`)
     } catch (error) {
@@ -222,9 +223,13 @@ const ResumeEditor: React.FC = () => {
                 <h3>
                   {exp.jobTitle} at {exp.company}
                 </h3>
-                <p>
-                {new Date(exp.startDate).toLocaleDateString()}~{new Date(exp.endDate).toLocaleDateString()}
-                </p>
+                 {exp.startDate || exp.endDate ? (
+                  <p>
+                    {exp.startDate ? new Date(exp.startDate).toLocaleDateString() : ''} 
+                    {exp.startDate && exp.endDate ? ' ~ ' : ''} 
+                    {exp.endDate ? new Date(exp.endDate).toLocaleDateString() : ''}
+                  </p>
+                ) : null}
                 {exp.imageUrl && (
                   <img
                     src={exp.imageUrl}
@@ -259,9 +264,13 @@ const ResumeEditor: React.FC = () => {
                 <h3>
                   {edu.degree} at {edu.institution}
                 </h3>
-                <p>
-                {new Date(edu.startDate).toLocaleDateString()}~{new Date(edu.endDate).toLocaleDateString()}
-                </p>
+                {edu.startDate || edu.endDate ? (
+                  <p>
+                    {edu.startDate ? new Date(edu.startDate).toLocaleDateString() : ''} 
+                    {edu.startDate && edu.endDate ? ' ~ ' : ''} 
+                    {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : ''}
+                  </p>
+                ) : null}
                 {edu.imageUrl && (
                   <img
                     src={edu.imageUrl}

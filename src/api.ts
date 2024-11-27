@@ -38,16 +38,17 @@ export const getFeedback = async (resumeId: string) => {
   }
 };
 
-export const submitFeedback = async (resumeId: string, userName: string, comment: string) => {
+export const submitFeedback = async (resumeId: string, username: string, comment: string) => {
  
     // check for mandatory input
-    if (!resumeId || !userName || !comment) {
+    if (!resumeId || !username || !comment) {
       throw new Error('All fields are required');
     }
+
     try {
       const response = await axios.post(`${API_URL}/feedbacks`, {
         resumeId,
-        userName,
+        username,
         comment,
       });
       return response.data; 
@@ -112,3 +113,9 @@ export const submitFeedback = async (resumeId: string, userName: string, comment
       throw new Error('Failed to fetch current username');
     }
   };
+
+// fetching resumeid by userid
+export const getResumeId = async () => {
+  const response = await axios.get(`${API_URL}/getResumeId`);
+  return response.data.resumeId;
+};
