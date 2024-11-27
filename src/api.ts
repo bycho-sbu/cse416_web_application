@@ -38,16 +38,16 @@ export const getFeedback = async (resumeId: string) => {
   }
 };
 
-export const submitFeedback = async (resumeId: string, userId: string, comment: string) => {
+export const submitFeedback = async (resumeId: string, userName: string, comment: string) => {
  
     // check for mandatory input
-    if (!resumeId || !userId || !comment) {
+    if (!resumeId || !userName || !comment) {
       throw new Error('All fields are required');
     }
     try {
       const response = await axios.post(`${API_URL}/feedbacks`, {
         resumeId,
-        userId,
+        userName,
         comment,
       });
       return response.data; 
@@ -68,6 +68,16 @@ export const submitFeedback = async (resumeId: string, userId: string, comment: 
       return ""; // Return an empty string or handle the error as needed
     }
   };
+
+  export const generateAIFeedback = async (resumeInfo: FormData | any): Promise<string> => {
+    try {
+        const response = await axios.post(`${API_URL}/generateFeedback`, resumeInfo);
+        return response.data;
+    } catch (error) {
+        console.error("Error:", error);
+        return "";
+    }
+  }
   
   export const submitResume = async (resumeData: any) => {
     try {

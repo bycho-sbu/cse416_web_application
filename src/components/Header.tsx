@@ -1,6 +1,6 @@
 // Header.tsx
 import { Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import '../stylesheets/header.css';
 import { getUsername } from '../api';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +48,7 @@ function Header() {
       <div className="blue-line"></div>
       <div className="header-content">
         <h1 className="site-name">
-            <Link to="/">
+            <Link to="/" style={{ textDecoration: 'None'}}>
                 BuildResume
             </Link>
         </h1>

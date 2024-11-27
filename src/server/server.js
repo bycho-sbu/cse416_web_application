@@ -324,10 +324,36 @@ async function startServer() {
                 res.status(500).send("Server error");
             }
         })
+
+        app.post("/generateFeedback", async (req, res) => {
+            try {
+                // Default
+                var content = "With following information, please provide professional and descriptive feedback for resume: " + JSON.stringify(req.body);
+                // console.log(content);
+                const completion = await groq.chat.completions
+                    .create({
+                    messages: [
+                        {
+                            role: "system",
+                            content: content,
+                        },
+                    ],
+                        model: "llama3-8b-8192",
+                    })
+                    .then((chatCompletion) => {
+                        // console.log(chatCompletion.choices[0]?.message?.content || "No results");
+                        res.send(chatCompletion.choices[0]?.message?.content || "No results");
+                    });
+            } catch(err) {
+                console.error(err);
+                res.status(500).send("Server error");
+            }
+        })
         
         app.post("/feedbacks", async (req, res) => {
-            const { resumeId, comment } = req.body;
-     
+            const { resumeId, comment, userName } = req.body;
+            console.log("USERNAME:", userName)
+
             try {
                 const resume = await Resume.findById(resumeId);
                 if (!resume) {
@@ -335,7 +361,7 @@ async function startServer() {
                 }
 
                 resume.feedbacks.push({
-                    reviewer: userId,   
+                    reviewer: userId,
                     comment,
                     date: new Date(), 
                 });

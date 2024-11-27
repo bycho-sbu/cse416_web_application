@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import InfoForm from './InfoForm';
 import Section from './Section';
-import { getResume, generateSummary } from '../api';
-import { fetchCurrentUserId } from '../api';
+import { getResume, generateSummary, generateAIFeedback, submitFeedback, fetchCurrentUserId, getUsername } from '../api';
 import { useNavigate } from 'react-router-dom';
 
 // Import the libraries
@@ -127,6 +126,23 @@ const ResumeEditor: React.FC = () => {
       console.error('Error generating summary:', error);
     }
   };
+
+  const generateFeedback = async (data: FormData | null) => {
+    if (!data) {
+        console.error("No data to generate feedback from.");
+        return;
+    }
+
+    try {
+        const res = await generateAIFeedback(data);
+        var resume = await getResume();
+        console.log(getUsername())
+        submitFeedback(resume._id, "AI", res);
+        navigate(`/feedback/${resume._id}`)
+    } catch (error) {
+        console.error("Error setting a feedback");
+    }
+  }
 
   // Function to download PDF with margins
   const downloadPDF = () => {
@@ -297,6 +313,17 @@ const ResumeEditor: React.FC = () => {
         <button onClick={downloadPDF} style={{ cursor: 'pointer' }}>
           Download PDF
         </button>
+      </div>
+      <div style={{ marginTop: '20px'}}>
+          <button onClick={() => {
+            if (!currentUserId) {
+              alert('You must login to create or edit resume. Please login');
+              navigate('/login');
+            } else {
+              generateFeedback(formData);
+            }}} style={{cursor: "pointer", marginRight: "10px"}}>
+            Generate Feedback from AI
+          </button>
       </div>
 
     </div>

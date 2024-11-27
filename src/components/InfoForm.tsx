@@ -54,7 +54,7 @@ interface FormData {
   }[]; 
 }
 
-const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData, currentUserId }) => {
+const InfoForm: React.FC<InfoFormProps> = ({ onClose, onSubmit, initialData }) => {
   const [firstName, setFirstName] = useState(initialData?.personalInformation.firstname || '');
   const [lastName, setLastName] = useState(initialData?.personalInformation.lastname || '');
   const [email, setEmail] = useState(initialData?.personalInformation.email || '');

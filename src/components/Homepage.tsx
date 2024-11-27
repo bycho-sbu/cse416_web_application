@@ -1,10 +1,25 @@
-import React from 'react';
 import '../stylesheets/homepage.css';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchCurrentUserId } from '../api';
 
 
 
 function Homepage() {
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchId = async () => {
+        try {
+            const userId = await fetchCurrentUserId();
+            setCurrentUserId(userId);
+        } catch (error) {
+            console.error("Error fetching ID: ", error);
+        }
+    }
+    fetchId();
+  })
+
   const navigate = useNavigate();
   return (
     <div className="homepage">
@@ -20,8 +35,16 @@ function Homepage() {
           Your journey to building professional resumes starts here. <br/>Create or upload your resume and get closer to your dream job today!
         </p>
         <div className="cta-buttons">
-          <button className="cta create-button" onClick={() => navigate('/resume-editor')}>Create New Resume</button>
-          <button className="cta upload-button" onClick={() => navigate('/resume-editor')}>Edit Existing Resume</button>
+          <button className="cta create-button" onClick={() => {
+            if(currentUserId) alert("You already have a resume. Routing to existing resume.");
+            navigate('/resume-editor')
+          }}>Create New Resume</button>
+          <button className="cta upload-button" onClick={() => {
+            if(!currentUserId) {
+                alert("You must login to edit resume. Please login.");
+                navigate("/login");
+            } else navigate('/resume-editor');
+          }}>Edit Existing Resume</button>
         </div>
       </section>{/*hero end*/}
       <section className="features">
