@@ -35,6 +35,7 @@ function Header() {
       try {
         const username = await getUsername();
         setCurrentUserName(username || 'Login');
+       
         if (username) {
           const userResumeId = await getResumeId();
           setResumeId(userResumeId);
@@ -80,7 +81,7 @@ function Header() {
                   className="feedback-option" 
                   onClick={() => {
                     if (resumeId) {
-                      navigate(`/feedback/${resumeId}`); // Pass resumeId dynamically
+                      navigate(`/feedback/${resumeId}`);
                     } else {
                       alert('Resume is not found. Please create a new Resume');
                       navigate('/resume-editor');

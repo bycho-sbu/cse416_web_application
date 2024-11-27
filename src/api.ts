@@ -110,7 +110,7 @@ export const submitFeedback = async (resumeId: string, username: string, comment
       return response.data.username;
     } catch (error) {
       console.error('Failed to fetch current username', error);
-      throw new Error('Failed to fetch current username');
+      return null
     }
   };
 
